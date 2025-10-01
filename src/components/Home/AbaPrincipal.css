@@ -1,0 +1,74 @@
+
+.aba-principal {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #ffffff 50%, #b9bea4 50%);
+  font-family: Arial, sans-serif;
+}
+
+.aba-principal h1 {
+  color: #000000;
+  margin-bottom: 40px;
+}
+
+.botoes {
+  display: flex;
+  gap: 20px;
+}
+
+.botao {
+  background-color: #aab193;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.botao:hover {
+  background-color: #8f9679;
+}
+
+
+.login-container {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  text-align: center;
+  width: 300px;
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #000000;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-form input {
+  padding: 12px;
+  border: 1px solid #b9bea4;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #8f9679;
+  box-shadow: 0 0 5px rgba(143, 150, 121, 0.5);
+}
+
+.login-form .botao {
+  margin-top: 10px;
+}
