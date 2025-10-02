@@ -2,11 +2,11 @@ import React, { useState, useMemo } from 'react';
 import './tarefas.css'; 
 
 const tarefas = [
-  { id: 1, label: 'Configurar ambiente de desenvolvimento' },
-  { id: 2, label: 'Criar a estrutura do componente React' },
-  { id: 3, label: 'Definir os estilos CSS para layout' },
-  { id: 4, label: 'Implementar a lógica de estado (useState)' },
-  { id: 5, label: 'Calcular e atualizar a barra de progresso' },
+  { id: 1, label: 'Configurar computador e softwares essenciais', dia: '25', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
+  { id: 2, label: 'Revisar políticas internas e compliance', dia: '26', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
+  { id: 3, label: 'Participar do treinamento de segurança da informação', dia: '27', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
+  { id: 4, label: 'Configuração do ambiente de desenvolvimento', dia: '28', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
+  { id: 5, label: 'Primeira tarefa prática supervisionada', dia: '29', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
 ];
 
 export function Tarefas() {
@@ -54,14 +54,24 @@ Assinatura: ${assinatura}`);
     console.log('Assinatura:', assinatura);
   };
 
+  const concluido = progressoPercentual === 100;
+
   return (
     <div className="container">
+      <div className="header-profile">
+        <div className={`profile-photo ${concluido ? 'complete' : ''}`}></div>
+        <div className="profile-info">
+          <span className="profile-name">Julio Rodrigues</span>
+          <span className="profile-setor">Setor: Desenvolvimento</span>
+        </div>
+      </div>
+
       <div className="form-card">
-        <h2>Tarefas do Colaborador</h2>
+        <h2>Treinamento de Integração - Setor de Desenvolvimento</h2>
 
         <div className="progress-bar-container">
           <div 
-            className="progress-bar-fill" 
+            className={`progress-bar-fill ${concluido ? 'complete' : ''}`} 
             style={{ width: `${progressoPercentual}%` }} 
           >
             {progressoPercentual}%
@@ -71,13 +81,20 @@ Assinatura: ${assinatura}`);
         <form onSubmit={handleSubmit}>
           {tarefas.map(tarefa => (
             <div key={tarefa.id} className="checkbox-item">
+              <div style={{ flex: 1 }}>
+                <label htmlFor={`tarefa-${tarefa.id}`}>
+                  {tarefa.label} <br />
+                  <span className="task-info">
+                    Dia: {tarefa.dia}/{tarefa.mes}/{tarefa.ano} | Setor: {tarefa.setor}
+                  </span>
+                </label>
+              </div>
               <input
                 type="checkbox"
                 id={`tarefa-${tarefa.id}`}
                 checked={checklist[tarefa.id]}
                 onChange={() => handleCheckboxChange(tarefa.id)}
               />
-              <label htmlFor={`tarefa-${tarefa.id}`}>{tarefa.label}</label>
             </div>
           ))}
 
