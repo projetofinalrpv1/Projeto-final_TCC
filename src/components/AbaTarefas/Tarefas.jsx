@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import './tarefas.css'; 
 
-// Dados das 5 tarefas (para os checkboxes)
 const tarefas = [
   { id: 1, label: 'Configurar ambiente de desenvolvimento' },
   { id: 2, label: 'Criar a estrutura do componente React' },
@@ -11,7 +10,6 @@ const tarefas = [
 ];
 
 export function Tarefas() {
-  // 1. Estados para rastrear as checkboxes e a assinatura
   const [checklist, setChecklist] = useState({
     1: false,
     2: false,
@@ -19,28 +17,29 @@ export function Tarefas() {
     4: false,
     5: false,
   });
-  // NOVO ESTADO: Para o campo de assinatura
+
   const [assinatura, setAssinatura] = useState('');
 
-  // 2. Função para atualizar o estado quando um checkbox é clicado
   const handleCheckboxChange = (id) => {
     setChecklist(prev => ({
       ...prev,
-      [id]: !prev[id], 
+      [id]: !prev[id],
     }));
   };
 
-  // 3. Cálculo da Porcentagem da Barra de Progresso
   const progressoPercentual = useMemo(() => {
     const totalTarefas = tarefas.length;
     const tarefasConcluidas = Object.values(checklist).filter(Boolean).length;
-    
     return Math.round((tarefasConcluidas / totalTarefas) * 100);
-  }, [checklist]); 
+  }, [checklist]);
 
-  // 4. Função para lidar com a submissão do formulário
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (progressoPercentual < 100) {
+      alert('Você precisa concluir todas as tarefas antes de finalizar.');
+      return;
+    }
 
     if (!assinatura.trim()) {
       alert('Por favor, preencha o campo de Assinatura antes de finalizar.');
@@ -48,9 +47,9 @@ export function Tarefas() {
     }
 
     alert(`Formulário submetido!
-    Progresso: ${progressoPercentual}%.
-    Assinatura: ${assinatura}`);
-    
+Progresso: ${progressoPercentual}%.
+Assinatura: ${assinatura}`);
+
     console.log('Checklist atual:', checklist);
     console.log('Assinatura:', assinatura);
   };
@@ -60,18 +59,16 @@ export function Tarefas() {
       <div className="form-card">
         <h2>Tarefas do Colaborador</h2>
 
-        {/* BARRA DE PROGRESSO */}
         <div className="progress-bar-container">
           <div 
             className="progress-bar-fill" 
             style={{ width: `${progressoPercentual}%` }} 
           >
-            {progressoPercentual}
+            {progressoPercentual}%
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Checkboxes */}
           {tarefas.map(tarefa => (
             <div key={tarefa.id} className="checkbox-item">
               <input
@@ -84,7 +81,6 @@ export function Tarefas() {
             </div>
           ))}
 
-          {/* NOVO CAMPO DE ASSINATURA */}
           <div className="assinatura-field">
             <label htmlFor="assinatura">Assinatura (Nome Completo):</label>
             <input
@@ -93,7 +89,7 @@ export function Tarefas() {
               value={assinatura}
               onChange={(e) => setAssinatura(e.target.value)}
               placeholder="Digite seu nome para assinar"
-              required 
+              required
             />
           </div>
 
@@ -103,5 +99,5 @@ export function Tarefas() {
         </form>
       </div>
     </div>
-  )
+  );
 }

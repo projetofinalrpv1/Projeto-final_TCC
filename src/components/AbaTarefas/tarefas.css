@@ -1,63 +1,48 @@
-/* -------------------------------------- */
-/* 1. CENTRALIZAÇÃO E LAYOUT PRINCIPAL */
-/* -------------------------------------- */
-
 .container {
-  /* Centraliza o conteúdo (form-card) vertical e horizontalmente */
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Garante que o container use a altura total da viewport */
-  min-height: 100vh; 
-  background-color: #f0f2f5;
+  background: linear-gradient(135deg, #ffffff 50%, #b9bea4 50%);
+  font-family: Arial, sans-serif;
   padding: 20px;
   box-sizing: border-box;
 }
 
 .form-card {
-  /* Define a largura do formulário como 60% da tela */
-  width: 60%; 
-  /* Adiciona uma largura máxima para não ficar muito grande em telas gigantes */
-  max-width: 800px; 
-  background-color: white;
+  width: 60%;
+  max-width: 800px;
+  background: #ffffff;
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .form-card h2 {
   text-align: center;
-  color: #333;
-  margin-bottom: 20px;
+  color: #000000;
+  margin-bottom: 30px;
 }
-
-/* -------------------------------------- */
-/* 2. BARRA DE PROGRESSO */
-/* -------------------------------------- */
 
 .progress-bar-container {
   width: 100%;
   height: 25px;
   background-color: #e0e0e0;
   border-radius: 5px;
-  overflow: hidden; /* Garante que o preenchimento não saia da borda */
+  overflow: hidden;
   margin-bottom: 30px;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background-color: #4CAF50; /* Cor de progresso */
-  transition: width 0.4s ease-in-out; /* Animação suave */
+  background-color: #aab193;
+  transition: width 0.4s ease-in-out;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: #fff;
   font-weight: bold;
 }
-
-/* -------------------------------------- */
-/* 3. ESTILO DOS CHECKBOXES E BOTÃO */
-/* -------------------------------------- */
 
 .checkbox-item {
   display: flex;
@@ -72,7 +57,6 @@
 }
 
 .checkbox-item input[type="checkbox"] {
-  /* Estiliza o checkbox nativo */
   margin-right: 15px;
   width: 20px;
   height: 20px;
@@ -84,32 +68,15 @@
   cursor: pointer;
 }
 
-.submit-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.submit-button:hover {
-  background-color: #0056b3;
-}
-
 .assinatura-field {
   margin-top: 20px;
   padding-top: 15px;
-  border-top: 1px dashed #ccc; /* Linha divisória para separar do checklist */
+  border-top: 1px dashed #ccc;
   margin-bottom: 20px;
 }
 
 .assinatura-field label {
-  display: block; /* Faz a label ocupar toda a largura */
+  display: block;
   margin-bottom: 8px;
   font-weight: bold;
   color: #333;
@@ -117,9 +84,26 @@
 
 .assinatura-field input[type="text"] {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box; /* Garante que o padding não aumente a largura total */
+  padding: 12px;
+  border: 1px solid #b9bea4;
+  border-radius: 8px;
   font-size: 16px;
+  box-sizing: border-box;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background-color: #aab193;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #8f9679;
 }
