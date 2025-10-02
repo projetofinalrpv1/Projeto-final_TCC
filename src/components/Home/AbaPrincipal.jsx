@@ -1,77 +1,76 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import "./AbaPrincipal.css";
+// src/components/Home/AbaPrincipal.jsx
+
+import React from 'react';
+import { useNavigate, Link, Outlet } from "react-router-dom"; // Inclua Outlet
+import "./AbaPrincipal.css"; // Seus estilos CSS
+
+// --- Sub-componentes do Layout (Mantenha aqui) ---
+
+const Header = () => (
+    /* ... (Mantenha o código do Header aqui) ... */
+    <header className="cabecalho">
+        <div className="cabecalho-esquerda">
+            <i className="fas fa-bars menu-icon"></i>
+            <h1>Minha Plataforma</h1>
+        </div>
+        <div className="cabecalho-direita">
+            <i className="fas fa-plus add-icon"></i>
+            <div className="perfil">U</div>
+        </div>
+    </header>
+);
+
+const menuItems = [
+    { name: 'Início', icon: 'fas fa-home', active: true, route: '/h' }, // Ajuste a rota para a Home
+    { name: 'Agenda', icon: 'fas fa-calendar-alt', route: '/h/agenda' }, 
+    { name: 'Gestor', icon: 'fas fa-users', route: '/h/gestor' }, // Exemplo de links
+    { name: 'Tarefas', icon: 'fas fa-tasks', route: '/h/tarefas' }, // Exemplo de links
+];
+
+const Sidebar = ({ items }) => (
+    /* ... (Mantenha o código do Sidebar aqui, usando <Link>s) ... */
+    <aside className="menu-lateral">
+        <nav>
+            <ul>
+                {items.map((item, index) => (
+                    <Link key={index} to={item.route} className="sidebar-link-wrapper">
+                        <li className={item.active ? 'ativo' : ''}>
+                            <i className={item.icon}></i> {item.name}
+                        </li>
+                    </Link>
+                ))}
+                
+                <div className="divisor"></div>
+                <li className="titulo-secao">Cursos</li>
+                {/* ... links de cursos ... */}
+                <div className="divisor"></div>
+                <Link to="/h/configuracoes" className="sidebar-link-wrapper">
+                    <li><i className="fas fa-cog"></i> Configurações</li>
+                </Link>
+            </ul>
+        </nav>
+    </aside>
+);
+
+
+// --- Componente Principal (Layout) ---
 
 export function AbaPrincipal() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const navigate = useNavigate();
+    return (
+        <>
+            <Header />
+            <div className="layout-container">
+                <Sidebar items={menuItems} />
 
-  // Objeto com emails e senhas de teste
-  const usuarios = {
-    // Usuários comuns
-    "usuario1@email.com": "senha123",
-    "usuario2@email.com": "senha456",
-    // Gestores
-    "gestor1@email.com": "senha789",
-    "gestor2@email.com": "senhaabc",
-  };
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    const senhaCorreta = usuarios[email];
-
-    if (senhaCorreta && senhaCorreta === senha) {
-      // Login bem-sucedido
-      if (email.includes("gestor")) {
-        // Redireciona para a página de gestor se o email for de gestor
-        navigate("/gestor");
-      } else {
-        // Redireciona para a página de tarefas para os outros usuários
-        navigate("/tarefas");
-      }
-    } else {
-      // Exibe um alerta de erro
-      alert("Email ou senha incorretos.");
-    }
-  };
-
-  return (
-    <div className="aba-principal">
-      <h1>ON THE JOB</h1>
-
-      <div className="login-container">
-        <h2>Login</h2>
-        <form className="login-form" onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Digite seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Digite sua senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-          />
-          <button type="submit" className="botao">
-            Entrar
-          </button>
-        </form>
-      </div>
-
-      <div className="botoes">
-        <Link to="/tarefas">
-          <button className="botao">Ir para Tarefas</button>
-        </Link>
-        <Link to="/gestor">
-          <button className="botao">Ir para Gestor</button>
-        </Link>
-      </div>
-    </div>
-  );
+                {/* CORREÇÃO: Usar a tag <main> com a classe que tem flex-grow: 1 */}
+                <main className="conteudo-principal"> 
+                   <Outlet />
+                </main>
+                
+            </div>
+        </>
+    );
 }
+
+// Nota: Eu envolvi o <Outlet> em uma div para aplicar um estilo seletor no CSS
+// Se o seu CSS já está na tag main, você pode manter a div como <main className="conteudo-principal"><Outlet /></main>

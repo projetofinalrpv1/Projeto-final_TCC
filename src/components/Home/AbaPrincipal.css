@@ -1,74 +1,256 @@
-
-.aba-principal {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #ffffff 50%, #b9bea4 50%);
-  font-family: Arial, sans-serif;
+/* Variáveis de Cores (Baseado no seu esquema) */
+:root {
+    --cor-principal: #aab193; 
+    --cor-secundaria: #b9bea4; 
+    --cor-hover: #8f9679; 
+    --cor-fundo: #ffffff; 
+    --cor-texto: #000000; 
+    --cor-fundo-sutil: #f7f7f7; 
 }
 
-.aba-principal h1 {
-  color: #000000;
-  margin-bottom: 40px;
+/* Base */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--cor-fundo-sutil); 
+    color: var(--cor-texto);
 }
 
-.botoes {
-  display: flex;
-  gap: 20px;
+.cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--cor-fundo);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    height: 60px;
+    box-sizing: border-box;
+    position: sticky; 
+    top: 0;
+    z-index: 1000;
 }
 
-.botao {
-  background-color: #aab193;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
+.cabecalho-esquerda {
+    display: flex;
+    align-items: center;
 }
 
-.botao:hover {
-  background-color: #8f9679;
+.cabecalho h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    margin-left: 15px;
+    color: var(--cor-texto);
+}
+
+.cabecalho-direita {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.menu-icon, .add-icon {
+    cursor: pointer;
+    font-size: 1.3rem;
+    color: var(--cor-texto);
+}
+
+.perfil {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: var(--cor-principal);
+    color: var(--cor-fundo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.layout-container {
+    display: flex;
+    min-height: calc(100vh - 60px); 
 }
 
 
-.login-container {
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-  text-align: center;
-  width: 300px;
+.menu-lateral {
+    width: 250px;
+    padding-top: 20px;
+    background-color: var(--cor-fundo);
+    border-right: 1px solid var(--cor-secundaria); 
+    overflow-y: auto;
+    flex-shrink: 0; 
 }
 
-.login-container h2 {
-  margin-bottom: 20px;
-  color: #000000;
+.menu-lateral ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+
+.sidebar-link-wrapper {
+    text-decoration: none; 
+    color: inherit; 
+    display: block; 
 }
 
-.login-form input {
-  padding: 12px;
-  border: 1px solid #b9bea4;
-  border-radius: 8px;
-  font-size: 14px;
+.menu-lateral li {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    color: var(--cor-texto); 
 }
 
-.login-form input:focus {
-  outline: none;
-  border-color: #8f9679;
-  box-shadow: 0 0 5px rgba(143, 150, 121, 0.5);
+.menu-lateral li i {
+    margin-right: 15px;
+    width: 20px; 
+    text-align: center;
 }
 
-.login-form .botao {
-  margin-top: 10px;
+.menu-lateral li:hover:not(.titulo-secao) {
+    background-color: var(--cor-fundo-sutil);
+}
+
+.menu-lateral li.ativo {
+    background-color: var(--cor-secundaria); 
+    color: var(--cor-texto);
+    border-left: 5px solid var(--cor-principal); 
+    padding-left: 15px; 
+    font-weight: bold;
+}
+
+.menu-lateral .divisor {
+    border-top: 1px solid var(--cor-secundaria);
+    margin: 10px 20px;
+}
+
+.menu-lateral .titulo-secao {
+    font-size: 0.85rem;
+    color: #555;
+    text-transform: uppercase;
+    margin-top: 10px;
+    padding: 5px 20px;
+    cursor: default;
+}
+
+/* 4. Conteúdo Principal */
+.conteudo-principal {
+    flex-grow: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.conteudo-principal h2 {
+    font-size: 1.8rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--cor-texto);
+}
+
+.bloco-atividades {
+    background-color: var(--cor-fundo);
+    border: 1px solid var(--cor-secundaria);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.atividade-item {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--cor-secundaria);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.atividade-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.atividade-item:hover {
+    background-color: var(--cor-fundo-sutil);
+}
+
+.atividade-titulo {
+    font-weight: bold;
+    margin: 0;
+    color: var(--cor-principal); 
+}
+
+.atividade-curso, .atividade-prazo {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 2px 0 0 0;
+}
+
+/* Blocos de Cursos (Cards principais) */
+.cursos-titulo {
+    margin-top: 40px;
+}
+
+.blocos-cursos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+
+.bloco-curso-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.bloco-curso {
+    background-color: var(--cor-fundo);
+    border: 1px solid var(--cor-secundaria);
+    border-radius: 8px;
+    width: 300px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+
+.bloco-curso:hover, 
+.bloco-curso-link:hover .bloco-curso { 
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.bloco-curso::before {
+    content: '';
+    display: block;
+    height: 10px;
+    background-color: var(--cor-principal); 
+}
+
+.bloco-curso h3 {
+    padding: 15px 15px 5px 15px;
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--cor-texto);
+}
+
+.curso-professor {
+    padding: 0 15px 15px 15px;
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+    border-bottom: 1px solid var(--cor-secundaria);
+}
+
+.curso-rodape {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 10px 15px;
+    color: var(--cor-hover);
+    font-size: 1.2rem;
 }
