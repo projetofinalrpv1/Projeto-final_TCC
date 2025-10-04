@@ -1,6 +1,6 @@
 .gestor-container {
   min-height: 100vh;
-  background: #f7f7f7;
+  background: #f7f7f7; 
   font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
@@ -29,6 +29,38 @@
   margin-top: 50px;
   width: 100%;
   max-width: 1200px;
+  padding: 0 20px; 
+  box-sizing: border-box; 
+}
+
+.gestor-principal {
+  font-size: 18px;
+  background: #aab193;
+  color: #111210;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  position: relative;
+  padding: 20px 28px;
+  border-radius: 14px;
+  font-weight: 600;
+}
+
+.gestor-organograma {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+  gap: 30px; 
+  width: 100%; 
+  margin-top: 40px;
+  margin-bottom: 60px;
+  justify-content: center; 
+}
+
+
+.colab-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
 }
 
 .gestor-card {
@@ -47,8 +79,10 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  min-width: 180px;
+  width: 100%; 
+  min-width: unset;
   position: relative;
+  box-sizing: border-box;
 }
 
 .gestor-card:hover {
@@ -57,14 +91,14 @@
 }
 
 .gestor-card.selecionado {
-  background: #e2e8d5;
-  border-color: #87946f;
+  background: #e2e8d5; 
+  border-color: #87946f; 
 }
 
 .gestor-card .nome {
   font-size: 18px;
   font-weight: bold;
-  color: #2a3f5f;
+  color: #2a3f5f; 
 }
 
 .gestor-card .divider {
@@ -80,55 +114,14 @@
   line-height: 1.5;
 }
 
-.gestor-principal {
-  font-size: 18px;
-  background: #aab193;
-  color: #111210;
-  margin-bottom: 40px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  position: relative;
-}
-
-/* Organograma */
-.gestor-organograma {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 60px;
-  position: relative;
-  margin-top: 40px;
-  margin-bottom: 60px;
-}
-
-/* Linha horizontal do gestor */
 .linha-horizontal {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  width: 80%;
-  height: 2px;
-  border-top: 2px dashed #aab193;
+  display: none; 
 }
 
-/* Colaborador */
-.colab-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-
-/* Linha vertical de cada colaborador */
 .linha-vertical {
-  width: 2px;
-  height: 40px;
-  background: #aab193;
-  margin-bottom: 15px;
+  display: none; 
 }
 
-/* Barra de progresso */
 .barra-progresso {
   width: 100%;
   height: 6px;
@@ -139,12 +132,11 @@
 
 .barra-preenchida {
   height: 100%;
-  background: #aab193;
+  background: #aab193; 
   border-radius: 3px;
   transition: width 0.3s ease;
 }
 
-/* Indicador de fase do treinamento */
 .fase-indicador {
   width: 14px;
   height: 14px;
@@ -155,18 +147,17 @@
 }
 
 .fase-indicador.inicio {
-  background: #4caf50; /* verde */
+  background: #4caf50; 
 }
 
 .fase-indicador.meio {
-  background: #ffb300; /* amarelo */
+  background: #ffb300; 
 }
 
 .fase-indicador.final {
-  background: #2196f3; /* azul */
+  background: #2196f3;
 }
 
-/* Info box */
 .info-box {
   margin-top: 20px;
   background: #fff;
@@ -178,6 +169,7 @@
   text-align: left;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   animation: fadeIn 0.3s ease;
+  box-sizing: border-box;
 }
 
 .info-box h3 {
@@ -191,8 +183,14 @@
 }
 
 
-/* Animação de entrada */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+
+@media (max-width: 600px) {
+    .gestor-organograma {
+        grid-template-columns: 1fr;
+    }
 }

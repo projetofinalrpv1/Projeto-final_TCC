@@ -6,6 +6,7 @@ import { AbaPrincipal } from './components/Home/AbaPrincipal';
 import { HomeDashboard } from './components/Home/DashboardAbaPrincipal'; // Importe o novo componente
 import { Gestor } from './components/AbaGestor/Gestor';
 import { Tarefas } from './components/AbaTarefas/Tarefas';
+import { Configuracoes } from './components/AbaConfiguracoes/Configuracoes';
 
 function App() {
   return(
@@ -24,7 +25,9 @@ function App() {
             {/* Outras Rotas Filhas que usam o mesmo Layout */}
             <Route path="gestor" element={<Gestor />} />
             <Route path="tarefas" element={<Tarefas />} />
-            
+            <Route path="configuracoes" element={<Configuracoes />} />
+
+
             {/* Rotas de Detalhe, se necessário (exemplo) */}
             <Route path="curso/:id" element={<div>Página do Curso Detalhe</div>} />
             
