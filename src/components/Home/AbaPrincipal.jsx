@@ -11,6 +11,7 @@ const Header = ({ onToggle }) => (
   <header className="cabecalho">
     <div className="cabecalho-esquerda">
       <FaBars className="menu-icon" onClick={onToggle} />
+      <img src="./src/assets/Logo-on-the-job1.PNG" alt="" />
       <h1>Minha Plataforma</h1>
     </div>
     <div className="cabecalho-direita">

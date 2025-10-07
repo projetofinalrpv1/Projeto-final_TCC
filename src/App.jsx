@@ -13,22 +13,22 @@ function App() {
     <>
       <Router>
         <Routes>
-          {/* Rota Raiz: A tela de Login */}
+     
           <Route path="/" element={<Login/>} /> 
 
-          {/* Rota Pai: O Layout (Header e Sidebar) */}
+       
           <Route path="/h" element={<AbaPrincipal />}>
             
-            {/* Rota Filha: A Página Inicial Padrão (Dashboard) */}
+       
             <Route index element={<HomeDashboard />} />
             
-            {/* Outras Rotas Filhas que usam o mesmo Layout */}
+         
             <Route path="gestor" element={<Gestor />} />
             <Route path="tarefas" element={<Tarefas />} />
             <Route path="configuracoes" element={<Configuracoes />} />
 
 
-            {/* Rotas de Detalhe, se necessário (exemplo) */}
+           
             <Route path="curso/:id" element={<div>Página do Curso Detalhe</div>} />
             
           </Route>
