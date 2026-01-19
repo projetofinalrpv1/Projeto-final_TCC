@@ -1,0 +1,102 @@
+
+.bloco-atividades {
+  background-color: var(--cor-fundo);
+  border: 1px solid var(--cor-secundaria);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 40px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.atividade-item {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--cor-secundaria);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.atividade-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.atividade-item:hover {
+    background-color: var(--cor-fundo-sutil);
+}
+
+.atividade-titulo {
+    font-weight: bold;
+    margin: 0;
+    color: var(--cor-principal); 
+}
+
+.atividade-curso, .atividade-prazo {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 2px 0 0 0;
+}
+
+
+.cursos-titulo {
+    margin-top: 40px;
+}
+
+.blocos-cursos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+
+.bloco-curso-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.bloco-curso {
+    background-color: var(--cor-fundo);
+    border: 1px solid var(--cor-secundaria);
+    border-radius: 8px;
+    width: 300px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+
+.bloco-curso:hover, 
+.bloco-curso-link:hover .bloco-curso { 
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.bloco-curso::before {
+    content: '';
+    display: block;
+    height: 10px;
+    background-color: var(--cor-principal); 
+}
+
+.bloco-curso h3 {
+    padding: 15px 15px 5px 15px;
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--cor-texto);
+}
+
+.curso-professor {
+    padding: 0 15px 15px 15px;
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+    border-bottom: 1px solid var(--cor-secundaria);
+}
+
+.curso-rodape {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 10px 15px;
+    color: var(--cor-hover);
+    font-size: 1.2rem;
+}

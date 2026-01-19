@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { Link } from "react-router-dom"; 
-
+import './Dashboard.css'
 
 
 const courseData = [
-    { id: 1, title: 'Matemática I', professor: 'Prof. Ana Silva', route: '/h/curso/mat1' },
-    { id: 2, title: 'Desenvolvimento Web', professor: 'Prof. João Santos', route: '/h/curso/devweb' },
-    { id: 3, title: 'Design Gráfico', professor: 'Prof. Carla Mendes', route: '/h/curso/design' },
+  { id: 1, title: 'Matemática I', professor: 'Prof. Ana Silva', route: '/app/curso/mat1' },
+  { id: 2, title: 'Desenvolvimento Web', professor: 'Prof. João Santos', route: '/app/curso/devweb' },
+  { id: 3, title: 'Design Gráfico', professor: 'Prof. Carla Mendes', route: '/app/curso/design' },
 ];
 
 const CourseCard = ({ title, professor, route }) => (
@@ -24,7 +24,7 @@ const CourseCard = ({ title, professor, route }) => (
     </Link>
 );
 
-export function HomeDashboard () {
+export function Dashboard () {
 
     return(
         <> 
