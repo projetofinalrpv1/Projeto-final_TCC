@@ -54,6 +54,7 @@ export function Login() {
 
   return (
     <div className="aba-principal">
+      <img src="./src/assets/Logo-on-the-job1.PNG" alt="" />
       <h1>ON THE JOB</h1>
       <div className="login-container">
         {!resetMode ? (

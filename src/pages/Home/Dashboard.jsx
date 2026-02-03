@@ -28,22 +28,22 @@ export function Dashboard () {
 
     return(
         <> 
-            <h2>Próximas Atividades</h2>
+            <h2>Adaptação</h2>
             
         
             <div className="bloco-atividades">
               
                 <div className="atividade-item">
-                    <p className="atividade-titulo">Tarefa: Análise de Dados</p>
+                    <p className="atividade-titulo">Treinamento do setor de Desenvolvimento de Software</p>
 
                 </div>
                 <div className="atividade-item">
-                    <p className="atividade-titulo">Quiz: Estruturas de Repetição</p>
+                    <p className="atividade-titulo">Tarefas Atribuidas</p>
 
                 </div>
             </div>
 
-            <h2 className="cursos-titulo">Meus Cursos</h2>
+            <h2 className="cursos-titulo">Conteudos disponíveis</h2>
 
             <div className="blocos-cursos">
                 {courseData.map((course) => (
