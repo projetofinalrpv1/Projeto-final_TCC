@@ -16,6 +16,7 @@ export function Login() {
   const usuarios = {
     "usuario1@email.com": { senha: "senha123", role: "colaborador", name: "Usuário Comum" },
     "gestor1@email.com": { senha: "senha789", role: "gestor", name: "Gestor Principal" },
+    "admin1@email.com": { senha: "admin123", role: "admin", name: "Administrador" }
   };
 
   const handleLogin = (e) => {

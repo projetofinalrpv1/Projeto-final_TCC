@@ -7,7 +7,7 @@ import {Tarefas} from "../pages/Tarefas/Tarefas";
 import {Configuracoes} from "../pages/Configuracoes/Configuracoes";
 import { Perfil } from "../pages/Perfil/Perfil";
 import MainLayout from "../layouts/MainLayout";
-
+import { Usuarios } from "../pages/Usuarios/Usuarios";
 import { AuthProvider } from '../contexts/AuthContext';
 import { ProtectedRoute } from './ProtectedRoute';
 
@@ -26,6 +26,9 @@ export function AppRoutes() {
               {/* Restrição específica para Perfil */}
               <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor', 'usuario']} />}>
                 <Route path="perfil" element={<Perfil />} />
+              </Route>
+              <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor']} />}>
+                <Route path="usuarios" element={<Usuarios />} />
               </Route>
               <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor']} />}>
                 <Route path="gestor" element={<Gestor />} />

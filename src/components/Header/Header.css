@@ -164,3 +164,41 @@
   text-align: center;
   margin-top: 15px;
 }
+
+.button-group-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.btn-admin {
+  background: #f8f9fa;
+  border: 1px solid #dadce0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #3c4043;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.btn-admin:hover {
+  background: #f1f3f4;
+}
+
+/* Overlay para fechar o menu ao clicar fora */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999; /* Fica atrás do google-menu (1000) */
+}
