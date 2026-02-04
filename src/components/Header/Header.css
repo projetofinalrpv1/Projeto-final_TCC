@@ -48,3 +48,119 @@
   font-weight: bold;
   cursor: pointer;
 }
+
+.perfil-link {
+  text-decoration: none; /* Remove o sublinhado padrão de links */
+  color: inherit;       /* Mantém a cor original do texto */
+}
+
+.perfil {
+  cursor: pointer;
+  transition: filter 0.2s;
+  /* Seus estilos atuais da div perfil aqui */
+}
+
+.perfil:hover {
+  filter: brightness(1.2); /* Efeito visual ao passar o mouse */
+}
+
+.perfil-container-google {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.perfil-circulo {
+  width: 35px;
+  height: 35px;
+  background: #d9534f; /* Cor do avatar no seu print */
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.google-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 300px;
+  background: #e9eef6; /* Fundo azulado claro do Google */
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  z-index: 1000;
+  padding: 15px;
+  color: #333;
+}
+
+.google-menu-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 15px;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.avatar-grande {
+  width: 80px;
+  height: 80px;
+  background: #d9534f;
+  border-radius: 50%;
+  font-size: 2rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.btn-gerenciar {
+  background: transparent;
+  border: 1px solid #747775;
+  padding: 10px 20px;
+  border-radius: 20px;
+  color: #0b57d0;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.google-menu-footer {
+  display: flex;
+  background: white;
+  border-radius: 15px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.footer-item {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.footer-item:first-child { border-right: 1px solid #eee; }
+.footer-item:hover { background: #f1f1f1; }
+
+.google-menu-legal {
+  font-size: 0.7rem;
+  color: #777;
+  text-align: center;
+  margin-top: 15px;
+}

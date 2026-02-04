@@ -5,7 +5,7 @@ import {Dashboard} from "../pages/Home/Dashboard";
 import {Gestor} from "../pages/Gestor/Gestor";
 import {Tarefas} from "../pages/Tarefas/Tarefas";
 import {Configuracoes} from "../pages/Configuracoes/Configuracoes";
-
+import { Perfil } from "../pages/Perfil/Perfil";
 import MainLayout from "../layouts/MainLayout";
 
 import { AuthProvider } from '../contexts/AuthContext';
@@ -23,7 +23,10 @@ export function AppRoutes() {
             <Route path="/app" element={<MainLayout />}>
               <Route index element={<Dashboard />} />
               
-              {/* Restrição específica para Gestores */}
+              {/* Restrição específica para Perfil */}
+              <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor', 'usuario']} />}>
+                <Route path="perfil" element={<Perfil />} />
+              </Route>
               <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor']} />}>
                 <Route path="gestor" element={<Gestor />} />
               </Route>
