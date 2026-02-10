@@ -15,31 +15,30 @@ export function AppRoutes() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Login />} />
+<Routes>
+  <Route path="/" element={<Login />} />
 
-          {/* PROTEÇÃO GLOBAL: Só entra no MainLayout se estiver logado */}
-          <Route element={<ProtectedRoute />}> 
-            <Route path="/app" element={<MainLayout />}>
-              <Route index element={<Dashboard />} />
-              
-              {/* Restrição específica para Perfil */}
-              <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor', 'usuario']} />}>
-                <Route path="perfil" element={<Perfil />} />
-              </Route>
-              <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor']} />}>
-                <Route path="usuarios" element={<Usuarios />} />
-              </Route>
-              <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor']} />}>
-                <Route path="gestor" element={<Gestor />} />
-              </Route>
+  <Route element={<ProtectedRoute />}> 
+    <Route path="/app" element={<MainLayout />}>
+      {/* Abas acessíveis por TODOS (Admin, Gestor e Colaborador) */}
+      <Route index element={<Dashboard />} />
+      <Route path="perfil" element={<Perfil />} />
+      <Route path="tarefas" element={<Tarefas />} />
+      <Route path="configuracoes" element={<Configuracoes />} />
 
-              <Route path="tarefas" element={<Tarefas />} />
-              <Route path="configuracoes" element={<Configuracoes />} />
-            </Route>
-          </Route>
-          
-        </Routes>
+      {/* Aba de Gestor: Acessível por Admin e Gestor */}
+      <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor']} />}>
+        <Route path="gestor" element={<Gestor />} />
+      </Route>
+
+      {/* PAINEL EXCLUSIVO: Apenas o Admin entra aqui */}
+      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route path="usuarios" element={<Usuarios />} />
+      </Route>
+      
+    </Route>
+  </Route>
+</Routes>
       </AuthProvider>
     </BrowserRouter>
   );

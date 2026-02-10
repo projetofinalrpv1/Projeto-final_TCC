@@ -13,12 +13,11 @@ export function Login() {
   const [identificadorReset, setIdentificadorReset] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
 
-  const usuarios = {
-    "usuario1@email.com": { senha: "senha123", role: "colaborador", name: "Usuário Comum" },
-    "gestor1@email.com": { senha: "senha789", role: "gestor", name: "Gestor Principal" },
-    "admin1@email.com": { senha: "admin123", role: "admin", name: "Administrador" }
-  };
-
+const usuarios = {
+  "admin@email.com": { senha: "123", role: "admin", name: "Administrador Geral" },
+  "gestor1@email.com": { senha: "789", role: "gestor", name: "Gestor Principal" },
+  "usuario1@email.com": { senha: "456", role: "colaborador", name: "Colaborador" },
+};
   const handleLogin = (e) => {
     e.preventDefault();
     const dadosUsuario = usuarios[email];
