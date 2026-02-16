@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(150)
+  senha     String   @db.VarChar(255)
+  cargo     Cargo    @default(COLABORADOR)
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relação: Um usuário pode ter várias tarefas atribuídas
+  tasks     Task[]
+
+  @@map("users")
+}
+
+model Task {
+  id          Int        @id @default(autoincrement())
+  titulo      String     @db.VarChar(200)
+  descricao   String?    @db.Text
+  status      Status     @default(PENDENTE)
+  prioridade  Prioridade @default(MEDIA)
+  prazo       DateTime?
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  // Chave estrangeira para o usuário
+  userId      Int        @map("user_id")
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
+
+// Enums ajudam a manter a consistência dos dados e geram documentação clara
+enum Cargo {
+  GESTOR
+  COLABORADOR
+}
+
+enum Status {
+  PENDENTE
+  EM_ANDAMENTO
+  CONCLUIDA
+}
+
+enum Prioridade {
+  BAIXA
+  MEDIA
+  ALTA
+}

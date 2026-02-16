@@ -1,15 +1,17 @@
-import fastify from 'fastify';
+import fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import { prisma } from './lib/prisma.js';
 
-const app = fastify({ logger: true });
+const app: FastifyInstance = fastify({ 
+  logger: true 
+});
 
 // 1. Registrar o CORS
 app.register(cors, { origin: '*' });
 
-// 2. Registrar o Swagger (Configuração básica)
+// 2. Registrar o Swagger
 app.register(swagger, {
   openapi: {
     info: {
@@ -20,23 +22,28 @@ app.register(swagger, {
   }
 });
 
-// 3. Registrar o Swagger UI (A interface visual)
+// 3. Registrar o Swagger UI
 app.register(swaggerUi, {
   routePrefix: '/docs',
   uiConfig: {
-    docExpansion: 'full',
+    docExpansion: 'list',
     deepLinking: false
   }
 });
 
-// 4. Suas rotas (Devem vir DEPOIS do Swagger)
+// 4. Rotas (Com tipagem explícita nas funções)
 app.get('/users', async (request, reply) => {
-  const users = await prisma.user.findMany();
-  return users;
+  try {
+    const users = await prisma.user.findMany();
+    return users;
+  } catch (error) {
+    app.log.error(error);
+    return reply.status(500).send({ error: 'Erro interno no servidor' });
+  }
 });
 
 app.get('/healthcheck', async () => {
-  return { status: 'ok' };
+  return { status: 'ok', timestamp: new Date().toISOString() };
 });
 
 export { app };
