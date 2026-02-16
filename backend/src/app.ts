@@ -2,46 +2,39 @@ import fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
-import { prisma } from './lib/prisma.js';
+
+import { userRoutes } from './routes/UserRoutes'; // Importe suas rotas
+import { workAreaRoutes } from './routes/WorkAreaRoutes';
+
 
 const app: FastifyInstance = fastify({ 
   logger: true 
 });
 
-// 1. Registrar o CORS
+
+
 app.register(cors, { origin: '*' });
 
-// 2. Registrar o Swagger
 app.register(swagger, {
   openapi: {
     info: {
       title: 'API On The Job',
       description: 'Documentação do sistema de gestão de tarefas',
       version: '1.0.0'
-    }
-  }
-});
+    },
 
-// 3. Registrar o Swagger UI
+  },
+
+});
 app.register(swaggerUi, {
-  routePrefix: '/docs',
-  uiConfig: {
-    docExpansion: 'list',
-    deepLinking: false
-  }
+  routePrefix: '/docs'
 });
 
-// 4. Rotas (Com tipagem explícita nas funções)
-app.get('/users', async (request, reply) => {
-  try {
-    const users = await prisma.user.findMany();
-    return users;
-  } catch (error) {
-    app.log.error(error);
-    return reply.status(500).send({ error: 'Erro interno no servidor' });
-  }
-});
-
+// --- REGISTRO DE ROTAS ---
+// Em vez de escrever as rotas aqui, você as "chama" de arquivos externos
+app.register(userRoutes, { prefix: '/api' });
+app.register(workAreaRoutes, { prefix: '/api' });
+// Mantendo apenas o essencial aqui
 app.get('/healthcheck', async () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });
