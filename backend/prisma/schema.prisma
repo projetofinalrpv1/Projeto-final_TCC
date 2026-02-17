@@ -27,17 +27,29 @@ model User {
 }
 
 model Task {
-  id          String     @id @default(uuid())
-  titulo      String
-  descricao   String?
-  status      Status     @default(PENDENTE)   // Usando o Enum Status
-  prioridade  Prioridade @default(MEDIA)      // Usando o Enum Prioridade
+  id           String     @id @default(uuid())
+  titulo       String
+  descricao    String?
+  status       Status     @default(PENDENTE)
+  prioridade   Prioridade @default(MEDIA)
+  
+  // Nova lógica:
+  isTemplate   Boolean    @default(false) // Se true, é uma tarefa "default" da área
+  
+  // Relacionamento com a Área
+  workAreaId   String
+  workArea     WorkArea   @relation(fields: [workAreaId], references: [id])
 
-  userId      String     @map("user_id") 
-  user        User       @relation("UserTasks", fields: [userId], references: [id], onDelete: Cascade)
+  // Relacionamento com o Usuário que vai fazer (Pode ser nulo se for apenas template)
+  userId       String?    @map("user_id") 
+  user         User?      @relation("UserTasks", fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  // Quem criou (Gestor ou Admin)
+  creatorId    String?    @map("creator_id")
+  // Note: Para simplificar no Prisma, você pode deixar o creatorId apenas como String por enquanto
+  
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   @@map("tasks")
 }
@@ -46,7 +58,7 @@ model WorkArea {
   id    String @id @default(uuid())
   nome  String @unique
   users User[]
-
+  tasks Task[] // <--- Adicione esta linha
   @@map("work_areas")
 }
 

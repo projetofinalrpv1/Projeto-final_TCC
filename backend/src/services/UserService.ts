@@ -1,28 +1,38 @@
 import bcrypt from 'bcrypt';
 import { UserRepository } from '../repositories/UserRepository';
+import { TaskRepository } from '../repositories/TaskRepository'; // Importe aqui
 
 export class UserService {
   private userRepository = new UserRepository();
+  private taskRepository = new TaskRepository(); // Instancie aqui
 
-  // Adicionamos 'workAreaId' na desestruturação dos parâmetros
   async executeRegister({ nome, email, senha, cargo, workAreaId }: any) {
-    // Regra 1: Email duplicado
     const userExists = await this.userRepository.findByEmail(email);
     if (userExists) throw new Error("Este e-mail já está em uso.");
 
-    // Regra 2: Segurança (Bcrypt)
     const hashedPassword = await bcrypt.hash(senha, 10);
 
-    // Regra 3: Persistência (Incluindo a relação com a WorkArea)
     const user = await this.userRepository.create({
-      nome,
-      email,
-      senha: hashedPassword,
-      cargo,
-      workAreaId // Campo obrigatório após a nossa mudança no schema
+      nome, email, senha: hashedPassword, cargo, workAreaId
     });
 
-    // Retorna sem a senha
+    // 2. BUSCAR TAREFAS DEFAULT (Usando o repositório)
+    const templateTasks = await this.taskRepository.findTemplatesByArea(workAreaId);
+
+    // 3. CLONAR TAREFAS (Usando o repositório)
+    if (templateTasks.length > 0) {
+      const onboardingTasks = templateTasks.map(task => ({
+        titulo: task.titulo,
+        descricao: task.descricao,
+        prioridade: task.prioridade,
+        workAreaId: workAreaId,
+        userId: user.id, 
+        isTemplate: false 
+      }));
+
+      await this.taskRepository.createMany(onboardingTasks);
+    }
+
     const { senha: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
