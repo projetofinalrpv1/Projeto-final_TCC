@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./Gestor.css";
+import fotoGestor from "../../assets/david.png";
 
 export function Gestor() {
   const [info, setInfo] = useState(null);
@@ -40,7 +41,7 @@ export function Gestor() {
       setor: "Desenvolvimento",
       descricao:
         "Responsável pela coordenação da equipe de desenvolvimento.",
-      foto: "https://via.placeholder.com/300"
+      foto: fotoGestor
     },
     colaboradores: [
       {

@@ -1,56 +1,87 @@
-
 :root {
-  --cor-principal: #aab193; 
-  --cor-secundaria: #b9bea4; 
-  --cor-hover: #8f9679; 
-  --cor-fundo: #ffffff; 
-  --cor-texto: #000000; 
-  --cor-fundo-sutil: #f7f7f7; 
-  --cor-ativo-fundo: #e0e6c9; 
-  --cor-circle-fundo: rgba(170, 177, 147, 0.2); 
+  --cor-principal: #aab193;
+  --cor-secundaria: #b9bea4;
+  --cor-hover: #8f9679;
+  --cor-fundo: #ffffff;
+  --cor-texto: #1f2a1f;
+  --cor-fundo-sutil: #f4f6ef;
+  --cor-ativo-fundo: #e4ead3;
+  --cor-destaque: #6f7c5a;
+
   --color-alert: #dc3545;
   --color-alert-hover: #bd2130;
 }
 
-/* --- Estilo Principal da Página --- */
+/* =========================
+   CONTAINER PRINCIPAL
+========================= */
+
 .configuracoes-pagina {
-  padding: 30px;
-  background-color: var(--cor-fundo-sutil); 
+  padding: 50px 60px;
+  background: linear-gradient(180deg, #f4f6ef 0%, #eef2e3 100%);
+  min-height: 100vh;
 }
 
+/* =========================
+   TÍTULO PRINCIPAL
+========================= */
+
 .configuracoes-pagina h2 {
-  font-size: 2rem;
+  font-size: 32px;
+  font-weight: 700;
   color: var(--cor-texto);
-  margin-bottom: 5px;
-  border-bottom: 2px solid var(--cor-ativo-fundo); 
-  padding-bottom: 15px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.configuracoes-pagina h2::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: var(--cor-principal);
+  margin-top: 10px;
+  border-radius: 4px;
 }
 
 .configuracoes-pagina p {
-  color: var(--cor-texto);
-  margin-bottom: 30px;
-  font-size: 1.1rem;
+  color: #4e5b45;
+  margin-bottom: 45px;
+  font-size: 16px;
 }
 
+/* =========================
+   SEÇÕES (CARDS)
+========================= */
 
 .secao-config {
-  background-color: var(--cor-fundo); 
+  background: var(--cor-fundo);
   border: 1px solid var(--cor-secundaria);
-  border-radius: 8px;
-  padding: 25px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 18px;
+  padding: 35px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  transition: 0.3s ease;
+}
+
+.secao-config:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
 }
 
 .secao-config h3 {
-  font-size: 1.4rem;
-  color: var(--cor-principal); 
-  margin-top: 0;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--cor-fundo-sutil);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cor-destaque);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+/* =========================
+   LISTA GERAL
+========================= */
 
 .secao-config ul {
   list-style: none;
@@ -59,56 +90,85 @@
 }
 
 .secao-config ul li {
-  padding: 10px 0;
+  padding: 14px 0;
   border-bottom: 1px solid var(--cor-fundo-sutil);
-  color: var(--cor-texto);
-  font-size: 0.95rem;
+  color: #3d4a36;
+  font-size: 15px;
 }
 
 .secao-config ul li:last-child {
   border-bottom: none;
 }
 
+/* =========================
+   BOTÕES PADRÃO
+========================= */
 
 .secao-config button {
-  padding: 10px 15px;
+  padding: 12px 20px;
+  border-radius: 10px;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: 600;
-  transition: background-color 0.2s;
+  cursor: pointer;
+  transition: 0.3s ease;
   margin-right: 15px;
+  margin-top: 10px;
 }
 
-
-.secao-config button:nth-of-type(1) {
-  background-color: #007bff;
-  color: var(--cor-fundo); 
+/* Botão primário */
+.btn-primary {
+  background: var(--cor-principal);
+  color: white;
 }
 
-.secao-config button:nth-of-type(1):hover {
-  background-color: #0056b3;
+.btn-primary:hover {
+  background: var(--cor-hover);
 }
 
-.secao-config button:nth-of-type(2) {
-  background-color: var(--color-alert); 
-  color: var(--cor-fundo);
+/* Botão alerta */
+.btn-alert {
+  background: var(--color-alert);
+  color: white;
 }
 
-.secao-config button:nth-of-type(2):hover {
-  background-color: var(--color-alert-hover); 
+.btn-alert:hover {
+  background: var(--color-alert-hover);
 }
 
-/* --- Responsividade Básica --- */
-@media (max-width: 600px) {
+/* Botão neutro */
+.btn-secondary {
+  background: var(--cor-ativo-fundo);
+  color: var(--cor-texto);
+}
+
+.btn-secondary:hover {
+  background: var(--cor-secundaria);
+}
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
+
+@media (max-width: 768px) {
   .configuracoes-pagina {
-    padding: 15px;
+    padding: 30px 20px;
   }
-  
+
+  .secao-config {
+    padding: 25px;
+  }
+
   .secao-config button {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
+    margin-right: 0;
   }
 }
+
+.botoes-config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+

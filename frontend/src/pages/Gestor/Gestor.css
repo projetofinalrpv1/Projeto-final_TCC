@@ -1,10 +1,26 @@
+/* ============================= */
+/* VARIÁVEIS */
+/* ============================= */
+:root {
+  --cor-principal: #aab193;
+  --cor-secundaria: #b9bea4;
+  --cor-fundo: #ffffff;
+  --cor-fundo-pagina: #f4f6f2;
+  --cor-texto: #2f3e2f;
+  --cor-texto-sec: #5f6f5f;
+  --cor-borda: #e2e6dc;
+  --cor-sucesso: #4caf50;
+  --cor-alerta: #ffb300;
+  --cor-info: #2196f3;
+}
+
 /* =======================
    CONTAINER GERAL
 ======================= */
 .gestor-container {
   min-height: 100vh;
-  background: #f7f7f7;
-  font-family: Arial, sans-serif;
+  background: var(--cor-fundo-pagina);
+  font-family: "Segoe UI", Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -15,16 +31,23 @@
 ======================= */
 .gestor-header {
   width: 100%;
-  padding: 15px 20px;
-  background: #b9bea4;
+  padding: 18px 30px;
+  background: linear-gradient(
+    90deg,
+    var(--cor-principal),
+    var(--cor-secundaria)
+  );
   display: flex;
   justify-content: flex-end;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
 .gestor-avatar {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
+  border: 2px solid #fff;
+  object-fit: cover;
 }
 
 /* =======================
@@ -33,55 +56,75 @@
 .gestor-main {
   width: 100%;
   max-width: 1200px;
-  padding: 40px 20px 60px;
+  padding: 50px 20px 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 60px;
+  gap: 70px;
 }
 
 /* =======================
    CARD BASE
 ======================= */
 .gestor-card {
-  background: #fff;
-  border: 2px solid #111210;
-  border-radius: 16px;
-  padding: 30px;
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: 20px;
+  padding: 50px;
   width: 100%;
-  max-width: 380px;
+  max-width: 600px;
   text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
   position: relative;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+
+  transition: 0.3s ease;
+}
+
+.gestor-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.08);
 }
 
 /* =======================
-   CARD DO GESTOR (DESTAQUE)
+   CARD DO GESTOR
 ======================= */
 .gestor-principal {
-  max-width: 720px;
-  background: #aab193;
-  border-radius: 24px;
-  padding: 44px;
-  gap: 12px;
+  max-width: 750px;
+  background: linear-gradient(
+    135deg,
+    var(--cor-principal),
+    var(--cor-secundaria)
+  );
+  border: none;
+  border-radius: 28px;
+  padding: 50px;
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+.gestor-principal .nome,
+.gestor-principal .setor,
+.gestor-principal .descricao {
+  color: #fff;
 }
 
 /* =======================
    FOTO DO GESTOR
 ======================= */
 .gestor-foto {
-  width: 140px;
-  height: 140px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   overflow: hidden;
   background: #fff;
-  border: 4px solid #87946f;
-  margin-bottom: 10px;
+  border: 5px solid rgba(255, 255, 255, 0.6);
+  margin-bottom: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .gestor-foto img {
@@ -94,32 +137,31 @@
    TEXTOS
 ======================= */
 .nome {
-  font-size: 19px;
-  font-weight: bold;
-  color: #2a3f5f;
-  line-height: 1.3;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--cor-texto);
 }
 
 .setor {
-  font-size: 15px;
-  color: #555;
+  font-size: 14px;
+  color: var(--cor-texto-sec);
 }
 
 .descricao {
-  font-size: 16px;
-  color: #333;
-  line-height: 1.4;
-  margin-top: 4px;
+  font-size: 15px;
+  line-height: 1.5;
+  margin-top: 6px;
 }
 
 /* =======================
    DIVISOR
 ======================= */
 .divider {
-  width: 70%;
+  width: 60%;
   height: 1px;
-  background: #ddd;
-  margin: 12px 0;
+  background: var(--cor-borda);
+  margin: 14px 0;
+  opacity: 0.6;
 }
 
 /* =======================
@@ -129,23 +171,16 @@
   width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 36px;
+  gap: 40px;
   justify-items: center;
-}
-
-.colab-wrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
 }
 
 /* =======================
    TREINAMENTO
 ======================= */
 .treinamento {
-  font-size: 14px;
-  color: #555;
-  line-height: 1.3;
+  font-size: 13px;
+  color: var(--cor-texto-sec);
 }
 
 /* =======================
@@ -153,53 +188,62 @@
 ======================= */
 .barra-progresso {
   width: 100%;
-  height: 6px;
-  background: #e0e0e0;
-  border-radius: 3px;
-  margin-top: 12px;
+  height: 8px;
+  background: #e6e9df;
+  border-radius: 20px;
+  margin-top: 15px;
   overflow: hidden;
 }
 
 .barra-preenchida {
   height: 100%;
-  background: #aab193;
-  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--cor-principal),
+    var(--cor-secundaria)
+  );
+  border-radius: 20px;
+  transition: width 0.4s ease;
 }
 
 /* =======================
    FASE DO TREINAMENTO
 ======================= */
 .fase-indicador {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 18px;
+  right: 18px;
+  box-shadow: 0 0 0 3px #fff;
 }
 
 .fase-indicador.inicio {
-  background: #4caf50;
+  background: var(--cor-sucesso);
 }
 
 .fase-indicador.meio {
-  background: #ffb300;
+  background: var(--cor-alerta);
 }
 
 .fase-indicador.final {
-  background: #2196f3;
+  background: var(--cor-info);
 }
 
 /* =======================
    RESPONSIVO
 ======================= */
-@media (max-width: 600px) {
-  .gestor-card {
-    max-width: 100%;
-    padding: 26px;
+@media (max-width: 768px) {
+  .gestor-main {
+    gap: 50px;
   }
 
   .gestor-principal {
-    padding: 32px 24px;
+    padding: 35px 25px;
+  }
+
+  .gestor-card {
+    padding: 26px;
   }
 }

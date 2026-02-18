@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import './tarefas.css'; 
+import React, { useState, useMemo } from "react";
+import "./tarefas.css";
 
 const tarefas = [
-  { id: 1, label: 'Configurar computador e softwares essenciais', dia: '25', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
-  { id: 2, label: 'Revisar políticas internas e compliance', dia: '26', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
-  { id: 3, label: 'Participar do treinamento de segurança da informação', dia: '27', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
-  { id: 4, label: 'Configuração do ambiente de desenvolvimento', dia: '28', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
-  { id: 5, label: 'Primeira tarefa prática supervisionada', dia: '29', mes: 'Set', ano: '2025', setor: 'Desenvolvimento' },
+  { id: 1, label: "Configurar computador e softwares essenciais", dia: "25", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
+  { id: 2, label: "Revisar políticas internas e compliance", dia: "26", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
+  { id: 3, label: "Participar do treinamento de segurança da informação", dia: "27", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
+  { id: 4, label: "Configuração do ambiente de desenvolvimento", dia: "28", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
+  { id: 5, label: "Primeira tarefa prática supervisionada", dia: "29", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
 ];
 
 export function Tarefas() {
@@ -18,40 +18,35 @@ export function Tarefas() {
     5: false,
   });
 
-  const [assinatura, setAssinatura] = useState('');
+  const [assinatura, setAssinatura] = useState("");
 
   const handleCheckboxChange = (id) => {
-    setChecklist(prev => ({
+    setChecklist((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
   };
 
   const progressoPercentual = useMemo(() => {
-    const totalTarefas = tarefas.length;
-    const tarefasConcluidas = Object.values(checklist).filter(Boolean).length;
-    return Math.round((tarefasConcluidas / totalTarefas) * 100);
+    const total = tarefas.length;
+    const concluidas = Object.values(checklist).filter(Boolean).length;
+    return Math.round((concluidas / total) * 100);
   }, [checklist]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
     if (progressoPercentual < 100) {
-      alert('Você precisa concluir todas as tarefas antes de finalizar.');
+      alert("Você precisa concluir todas as tarefas antes de finalizar.");
       return;
     }
 
     if (!assinatura.trim()) {
-      alert('Por favor, preencha o campo de Assinatura antes de finalizar.');
+      alert("Preencha o campo de assinatura.");
       return;
     }
 
-    alert(`Formulário submetido!
-Progresso: ${progressoPercentual}%.
-Assinatura: ${assinatura}`);
-
-    console.log('Checklist atual:', checklist);
-    console.log('Assinatura:', assinatura);
+    alert(`Treinamento finalizado com sucesso!\nAssinado por: ${assinatura}`);
   };
 
   const concluido = progressoPercentual === 100;
@@ -59,10 +54,10 @@ Assinatura: ${assinatura}`);
   return (
     <div className="container">
       <div className="header-profile">
-        <div className={`profile-photo ${concluido ? 'complete' : ''}`}></div>
+        <div className={`profile-photo ${concluido ? "complete" : ""}`}></div>
         <div className="profile-info">
           <span className="profile-name">Julio Rodrigues</span>
-          <span className="profile-setor">Setor: Desenvolvimento</span>
+       
         </div>
       </div>
 
@@ -70,25 +65,24 @@ Assinatura: ${assinatura}`);
         <h2>Treinamento de Integração - Setor de Desenvolvimento</h2>
 
         <div className="progress-bar-container">
-          <div 
-            className={`progress-bar-fill ${concluido ? 'complete' : ''}`} 
-            style={{ width: `${progressoPercentual}%` }} 
+          <div
+            className={`progress-bar-fill ${concluido ? "complete" : ""}`}
+            style={{ width: `${progressoPercentual}%` }}
           >
             {progressoPercentual}%
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
-          {tarefas.map(tarefa => (
+          {tarefas.map((tarefa) => (
             <div key={tarefa.id} className="checkbox-item">
-              <div style={{ flex: 1 }}>
-                <label htmlFor={`tarefa-${tarefa.id}`}>
-                  {tarefa.label} <br />
-                  <span className="task-info">
-                    Dia: {tarefa.dia}/{tarefa.mes}/{tarefa.ano} | Setor: {tarefa.setor}
-                  </span>
-                </label>
-              </div>
+              <label htmlFor={`tarefa-${tarefa.id}`}>
+                {tarefa.label}
+                <span className="task-info">
+                  {tarefa.dia}/{tarefa.mes}/{tarefa.ano} • {tarefa.setor}
+                </span>
+              </label>
+
               <input
                 type="checkbox"
                 id={`tarefa-${tarefa.id}`}
@@ -99,7 +93,7 @@ Assinatura: ${assinatura}`);
           ))}
 
           <div className="assinatura-field">
-            <label htmlFor="assinatura">Assinatura (Nome Completo):</label>
+            <label htmlFor="assinatura">Assinatura (Nome Completo)</label>
             <input
               id="assinatura"
               type="text"

@@ -1,77 +1,89 @@
-/* =======================
-   CONTAINER PRINCIPAL (Ajuste de Grudado)
-   Aplique esta classe na <main> ou <div> que envolve o conteúdo
-======================= */
+/* ======================
+   CONTAINER PRINCIPAL
+====================== */
+
 .conteudo-pagina {
-  padding: 30px 50px; /* Cria o respiro nas laterais e no topo */
+  padding: 50px 70px;
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
-/* Títulos das seções */
-.titulo-secao-pagina {
-  margin-bottom: 25px;
-  font-size: 1.8rem;
+/* ======================
+   TÍTULOS
+====================== */
+
+.titulo-secao {
+  font-size: 28px;
+  font-weight: 700;
   color: var(--cor-texto);
+  margin-bottom: 10px;
+  letter-spacing: 0.6px;
 }
 
-/* =======================
-   ATIVIDADES
-======================= */
+.cursos-subtitulo {
+  font-size: 15px;
+  color: #4e6e53;
+  margin-bottom: 35px;
+  opacity: 0.9;
+}
+
+/* ======================
+   BLOCO DE ATIVIDADES
+====================== */
+
 .bloco-atividades {
   background-color: var(--cor-fundo);
   border: 1px solid var(--cor-secundaria);
-  border-radius: 8px;
-  padding: 24px;
-  margin-bottom: 48px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 18px;
+  padding: 30px;
+  margin-bottom: 60px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+  transition: 0.3s ease;
 }
 
+.bloco-atividades:hover {
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+}
+
+/* ======================
+   ITENS DE ATIVIDADE
+====================== */
+
 .atividade-item {
-  padding: 14px 6px;
+  padding: 18px 15px;
   border-bottom: 1px dashed var(--cor-secundaria);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.25s ease;
+  border-radius: 8px;
 }
 
 .atividade-item:last-child {
   border-bottom: none;
-  padding-bottom: 6px;
 }
 
 .atividade-item:hover {
   background-color: var(--cor-fundo-sutil);
+  transform: translateX(4px);
 }
 
 .atividade-titulo {
-  font-weight: bold;
+  font-size: 17px;
+  font-weight: 600;
   margin: 0;
-  color: var(--cor-principal); 
+  color: var(--cor-principal);
 }
 
-.atividade-curso,
-.atividade-prazo {
-  font-size: 0.9rem;
-  color: #666;
-  margin: 4px 0 0 0;
-}
-
-/* =======================
-   CURSOS
-======================= */
-
-.cursos-titulo {
-  margin-top: 20px; /* Reduzi um pouco já que o container já tem padding */
-  margin-bottom: 25px;
-}
+/* ======================
+   GRID DE CURSOS
+====================== */
 
 .blocos-cursos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 36px;
-  justify-content: flex-start; /* Garante alinhamento à esquerda */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 35px;
 }
 
 .bloco-curso-link {
@@ -79,64 +91,78 @@
   color: inherit;
 }
 
-/* =======================
+/* ======================
    CARD DO CURSO
-======================= */
+====================== */
 
 .bloco-curso {
   background-color: var(--cor-fundo);
   border: 1px solid var(--cor-secundaria);
-  border-radius: 8px;
-  width: 300px;
-  padding-bottom: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 18px;
   overflow: hidden;
-  position: relative;
-  transition: transform 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.bloco-curso:hover,
-.bloco-curso-link:hover .bloco-curso { 
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+.bloco-curso:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
 }
 
-.bloco-curso::before {
-  content: '';
-  display: block;
+/* Barra superior */
+.bloco-curso-topo {
   height: 10px;
-  background-color: var(--cor-principal); 
+  background: linear-gradient(
+    90deg,
+    var(--cor-principal),
+    var(--cor-secundaria)
+  );
 }
 
-/* =======================
-   TEXTO
-======================= */
+/* Conteúdo */
+.bloco-curso-conteudo {
+  padding: 26px;
+}
 
 .bloco-curso h3 {
-  padding: 20px 20px 8px 20px;
-  margin: 0;
-  font-size: 1.4rem;
+  margin: 0 0 10px 0;
+  font-size: 21px;
+  font-weight: 700;
   color: var(--cor-texto);
 }
 
 .curso-professor {
-  padding: 0 20px 18px 20px;
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 14px;
   color: #666;
-  border-bottom: 1px solid var(--cor-secundaria);
+  opacity: 0.85;
 }
 
-/* =======================
-   RODAPÉ
-======================= */
-
+/* Rodapé */
 .curso-rodape {
+  padding: 18px 26px 26px 26px;
+  border-top: 1px solid var(--cor-secundaria);
   display: flex;
-  justify-content: flex-end;
-  gap: 18px;
-  padding: 14px 20px;
-  color: var(--cor-hover);
-  font-size: 1.2rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* TAG */
+.tag-conteudo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-principal);
+  background-color: var(--cor-fundo-sutil);
+  padding: 6px 14px;
+  border-radius: 25px;
+  transition: 0.3s ease;
+}
+
+.bloco-curso:hover .tag-conteudo {
+  background-color: var(--cor-principal);
+  color: #fff;
 }

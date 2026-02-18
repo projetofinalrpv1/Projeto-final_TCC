@@ -7,29 +7,55 @@ export function Configuracoes() {
 
   return (
     <div className="configuracoes-pagina">
-      <h2>Configurações do Usuário</h2>
-      <p>Aqui você pode gerenciar suas preferências, notificações e segurança.</p>
+      <header className="config-header">
+        <h2>Configurações do Usuário</h2>
+        <p>
+          Aqui você pode gerenciar suas preferências, notificações e segurança.
+        </p>
+      </header>
 
+      {/* ================= GERAL ================= */}
       <section className="secao-config">
         <h3>Geral</h3>
         <ul>
-          <li>Idioma: Português (Brasil)</li>
-          <li>Fuso Horário: GMT-3</li>
+          <li>
+            <strong>Idioma:</strong> Português (Brasil)
+          </li>
+          <li>
+            <strong>Fuso Horário:</strong> GMT-3
+          </li>
         </ul>
       </section>
 
+      {/* ================= CONTA ================= */}
       <section className="secao-config">
         <h3>Conta</h3>
-        <button>Informações do usuário</button>
-        <button>Alterar senha</button>
+
+        <div className="botoes-config">
+          <button className="btn-primary">
+            Informações do usuário
+          </button>
+
+          <button className="btn-alert">
+            Alterar senha
+          </button>
+        </div>
       </section>
 
-      {/* AÇÕES EXTRAS APENAS PARA GESTOR */}
-      {user.role === "gestor" && (
+      {/* ================= ADMIN (APENAS GESTOR) ================= */}
+      {user?.role === "gestor" && (
         <section className="secao-config">
           <h3>Administração</h3>
-          <button>Gerenciar usuários</button>
-          <button>Permissões do sistema</button>
+
+          <div className="botoes-config">
+            <button className="btn-primary">
+              Gerenciar usuários
+            </button>
+
+            <button className="btn-secondary">
+              Permissões do sistema
+            </button>
+          </div>
         </section>
       )}
     </div>

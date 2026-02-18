@@ -11,6 +11,7 @@ import { Usuarios } from "../pages/Usuarios/Usuarios";
 import { AuthProvider } from '../contexts/AuthContext';
 import { ProtectedRoute } from './ProtectedRoute';
 
+
 export function AppRoutes() {
   return (
     <BrowserRouter>
