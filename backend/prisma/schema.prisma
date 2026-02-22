@@ -59,7 +59,24 @@ model WorkArea {
   nome  String @unique
   users User[]
   tasks Task[] // <--- Adicione esta linha
+  materials Material[]
   @@map("work_areas")
+}
+
+model Material {
+  id          String   @id @default(uuid())
+  titulo      String
+  gestor      String
+  descricao   String   @db.Text
+  arquivoUrl  String   @db.Text
+  rota        String?  // <-- ADICIONE ESTA LINHA (o ? torna opcional)
+  workAreaId  String
+  workArea    WorkArea @relation(fields: [workAreaId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("materials") 
 }
 
 // --- ENUMS ---

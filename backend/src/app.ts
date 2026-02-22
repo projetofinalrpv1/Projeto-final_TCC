@@ -3,16 +3,14 @@ import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 
-import { userRoutes } from './routes/UserRoutes'; // Importe suas rotas
+import { userRoutes } from './routes/UserRoutes'; 
 import { workAreaRoutes } from './routes/WorkAreaRoutes';
 import { taskRoutes } from './routes/TaskRoutes';
-
+import { materialRoutes } from './routes/MaterialRoutes';
 
 const app: FastifyInstance = fastify({ 
   logger: true 
 });
-
-
 
 app.register(cors, { origin: '*' });
 
@@ -32,11 +30,11 @@ app.register(swaggerUi, {
 });
 
 // --- REGISTRO DE ROTAS ---
-// Em vez de escrever as rotas aqui, você as "chama" de arquivos externos
 app.register(userRoutes, { prefix: '/api' });
 app.register(workAreaRoutes, { prefix: '/api' });
 app.register(taskRoutes, { prefix: '/api' });
-// Mantendo apenas o essencial aqui
+app.register(materialRoutes, { prefix: '/api' });
+
 app.get('/healthcheck', async () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });

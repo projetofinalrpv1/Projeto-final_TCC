@@ -23,4 +23,14 @@ export class TaskService {
 
   return await this.taskRepository.updateStatus(id, status, prioridade);
 }
+
+async executeDelete(id: string) {
+  const taskExists = await this.taskRepository.findById(id);
+
+  if (!taskExists) {
+    throw new Error("Tarefa não encontrada.");
+  }
+
+  return await this.taskRepository.delete(id);
+}
 }

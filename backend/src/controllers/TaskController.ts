@@ -31,3 +31,15 @@ export const updateTaskStatus = async (request: FastifyRequest, reply: FastifyRe
     return reply.status(400).send({ message: error.message });
   }
 };
+
+export const deleteTask = async (request: FastifyRequest, reply: FastifyReply) => {
+  const { id } = request.params as { id: string };
+  const taskService = new TaskService();
+
+  try {
+    await taskService.executeDelete(id);
+    return reply.status(204).send();
+  } catch (error: any) {
+    return reply.status(400).send({ message: error.message });
+  }
+};

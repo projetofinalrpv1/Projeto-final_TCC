@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { createTask, listTasks, updateTaskStatus } from '../controllers/TaskController';
+import { createTask, listTasks, updateTaskStatus,deleteTask } from '../controllers/TaskController';
 
 export async function taskRoutes(app: FastifyInstance) {
   app.post('/tasks', {
@@ -47,5 +47,25 @@ export async function taskRoutes(app: FastifyInstance) {
     }
   }
 }, updateTaskStatus);
+
+app.delete('/tasks/:id', {
+  schema: {
+    summary: 'Deleta uma tarefa específica',
+    tags: ['Tarefas'],
+    params: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', format: 'uuid' }
+      }
+    },
+    response: {
+      204: { type: 'null' },
+      400: {
+        type: 'object',
+        properties: { message: { type: 'string' } }
+      }
+    }
+  }
+}, deleteTask);
 }
 

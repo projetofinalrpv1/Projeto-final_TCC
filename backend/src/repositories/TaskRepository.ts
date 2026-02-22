@@ -8,8 +8,8 @@ export class TaskRepository {
       descricao: data.descricao,
       status: data.status,
       prioridade: data.prioridade,
-      isTemplate: data.isTemplate || false, // Garante um valor
-      workAreaId: data.workAreaId, // O CAMPO FALTANTE É ESTE!
+      isTemplate: data.isTemplate || false, 
+      workAreaId: data.workAreaId,
       userId: data.userId || null   // Pode ser nulo se for template
     }
   });
@@ -49,6 +49,18 @@ async updateStatus(id: string, status: any, prioridade?: any) {
       status: status,
       ...(prioridade && { prioridade }) // Só atualiza a prioridade se ela for enviada
     }
+  });
+}
+
+async delete(id: string) {
+  return await prisma.task.delete({
+    where: { id }
+  });
+}
+
+async findById(id: string) {
+  return await prisma.task.findUnique({
+    where: { id }
   });
 }
 }
