@@ -8,7 +8,7 @@ export class UserRepository {
         email: data.email,
         senha: data.senha,
         cargo: data.cargo,
-        workAreaId: data.workAreaId // Certifique-se de que este campo está aqui!
+        workAreaId: data.workAreaId 
       }
     });
   }
@@ -17,25 +17,33 @@ export class UserRepository {
     return await prisma.user.findUnique({ where: { email } });
   }
 
+
+  async findById(id: string) {
+    return await prisma.user.findUnique({ 
+      where: { id },
+      include: { workArea: true } 
+    });
+  }
+
   async findAll() {
-  return await prisma.user.findMany({
-    include: {
-      workArea: true // Traz os dados da tabela relacionada
-    }
-  });
-}
+    return await prisma.user.findMany({
+      include: {
+        workArea: true 
+      }
+    });
+  }
 
+  // Atualizado para aceitar o objeto dinâmico 'data' que o seu Service filtrará
   async update(id: string, data: any) {
-  return await prisma.user.update({
-    where: { id },
-    data: data, // Aqui o Prisma recebe o que mudar (nome, senha, etc.)
-  });
-}
+    return await prisma.user.update({
+      where: { id },
+      data: data, // O Prisma só atualizará os campos presentes neste objeto
+    });
+  }
 
-  // UserRepository.ts
   async delete(id: string) {
-  return await prisma.user.delete({
-    where: { id },
-  });
-}
+    return await prisma.user.delete({
+      where: { id },
+    });
+  }
 }

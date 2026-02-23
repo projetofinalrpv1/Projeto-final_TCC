@@ -15,7 +15,8 @@ export class MaterialService {
       gestor: data.gestor,
       descricao: data.descricao || "", 
       arquivoUrl: data.arquivoUrl,
-      workAreaId: data.workAreaId
+      workAreaId: data.workAreaId,
+      rota: data.rota
     });
   }
 

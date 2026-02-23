@@ -45,15 +45,20 @@ export class UserService {
 }
 
 async executeUpdate(id: string, data: any) {
-  // 1. Criamos um objeto vazio
+  // 1. Verificamos se o usuário existe antes de tentar atualizar
+  const userExists = await this.userRepository.findById(id);
+  if (!userExists) {
+    throw new Error("Usuário não encontrado.");
+  }
+
+  // 2. Criamos o objeto de atualização apenas com campos presentes no 'data'
+  // O segredo aqui é que o Prisma ignora chaves que são 'undefined'
   const updateData: any = {};
 
-  // 2. Só adicionamos ao objeto o que foi enviado e não é vazio
-  if (data.nome) updateData.nome = data.nome;
-  if (data.email) updateData.email = data.email;
-  if (data.cargo) updateData.cargo = data.cargo;
+  if (data.nome !== undefined) updateData.nome = data.nome;
+  if (data.email !== undefined) updateData.email = data.email;
+  if (data.cargo !== undefined) updateData.cargo = data.cargo;
   
-  // Aqui está o pulo do gato: só valida o workAreaId se ele existir no body
   if (data.workAreaId && data.workAreaId.trim() !== "") {
     updateData.workAreaId = data.workAreaId;
   }
@@ -62,7 +67,11 @@ async executeUpdate(id: string, data: any) {
     updateData.senha = await bcrypt.hash(data.senha, 10);
   }
 
-  // 3. O Prisma agora só vai dar UPDATE nas colunas que estão dentro de updateData
+  // 3. Verifica se há algo para atualizar para evitar chamadas inúteis ao banco
+  if (Object.keys(updateData).length === 0) {
+    throw new Error("Nenhum dado fornecido para atualização.");
+  }
+
   const updatedUser = await this.userRepository.update(id, updateData);
 
   const { senha: _, ...userWithoutPassword } = updatedUser;
