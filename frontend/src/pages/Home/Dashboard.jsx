@@ -1,33 +1,82 @@
 // src/components/Home/HomeDashboard.jsx
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Dashboard.css";
 
-const courseData = [
-  { id: 1, title: "Matemática I", professor: "Prof. Ana Silva", route: "/app/curso/mat1" },
-  { id: 2, title: "Desenvolvimento Web", professor: "Prof. João Santos", route: "/app/curso/devweb" },
-  { id: 3, title: "Design Gráfico", professor: "Prof. Carla Mendes", route: "/app/curso/design" },
+const initialCourses = [
+  {
+    id: 1,
+    title: "Arquitetura de Software ",
+    professor: "Liderança Técnica",
+    route: "/app/curso/arq",
+  },
+  {
+    id: 2,
+    title: " Práticas em Desenvolvimento",
+    professor: "Equipe de Engenharia",
+    route: "/app/curso/dev",
+  },
+  {
+    id: 3,
+    title: "Segurança e Governança de TI",
+    professor: "Time de Infraestrutura",
+    route: "/app/curso/seguranca",
+  },
 ];
+const CourseCard = ({ id, title, professor, route, onDelete }) => (
+  <div className="bloco-curso-wrapper">
+    <Link to={route} className="bloco-curso-link">
+      <div className="bloco-curso">
+        <div className="bloco-curso-topo" />
 
-const CourseCard = ({ title, professor, route }) => (
-  <Link to={route} className="bloco-curso-link">
-    <div className="bloco-curso">
-      <div className="bloco-curso-topo" />
+        <div className="bloco-curso-conteudo">
+          <h3>{title}</h3>
+          <p className="curso-professor">{professor}</p>
+        </div>
 
-      <div className="bloco-curso-conteudo">
-        <h3>{title}</h3>
-        <p className="curso-professor">{professor}</p>
+        <div className="curso-rodape">
+          <span className="tag-conteudo">Material Estratégico</span>
+        </div>
       </div>
+    </Link>
 
-      <div className="curso-rodape">
-        <span className="tag-conteudo">Material recomendado</span>
-      </div>
-    </div>
-  </Link>
+    <button
+      className="botao-excluir"
+      onClick={() => onDelete(id)}
+    >
+      ✕
+    </button>
+  </div>
 );
 
 export function Dashboard() {
+  const [courses, setCourses] = useState(initialCourses);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [novoConteudo, setNovoConteudo] = useState({
+    titulo: "",
+    tipo: "pdf",
+    arquivo: null,
+  });
+
+  const adicionarConteudo = () => {
+    if (!novoConteudo.titulo) return;
+
+    const novo = {
+      id: Date.now(),
+      title: novoConteudo.titulo,
+      professor:
+        novoConteudo.tipo === "pdf"
+          ? "Documento Corporativo"
+          : "Treinamento em Vídeo",
+      route: "#",
+    };
+
+    setCourses([...courses, novo]);
+    setMostrarModal(false);
+    setNovoConteudo({ titulo: "", tipo: "pdf", arquivo: null });
+  };
+
   return (
     <div className="conteudo-pagina">
       <h2 className="titulo-secao">Adaptação</h2>
@@ -35,24 +84,34 @@ export function Dashboard() {
       <div className="bloco-atividades">
         <div className="atividade-item">
           <p className="atividade-titulo">
-            Treinamento do setor de Desenvolvimento de Software
+            Programa de integração - Engenharia de Software
           </p>
         </div>
 
         <div className="atividade-item">
           <p className="atividade-titulo">
-            Tarefas atribuídas
+            Demandas técnicas atribuídas
           </p>
         </div>
       </div>
 
-      <h2 className="titulo-secao">Conteúdos recomendados</h2>
+      <div className="topo-conteudos">
+        <h2 className="titulo-secao">Conteúdos recomendados</h2>
+
+        <button
+          className="botao-primario"
+          onClick={() => setMostrarModal(true)}
+        >
+          + Adicionar conteúdo
+        </button>
+      </div>
+
       <p className="cursos-subtitulo">
-        Materiais selecionados pelo gestor para apoiar seu aprendizado
+        Materiais estratégicos voltados para desenvolvimento e tecnologia
       </p>
 
       <div className="blocos-cursos">
-        {courseData.map((course) => (
+        {courses.map((course) => (
           <CourseCard
             key={course.id}
             title={course.title}
@@ -61,6 +120,69 @@ export function Dashboard() {
           />
         ))}
       </div>
+
+      {mostrarModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <h3 className="modal-titulo">Novo Conteúdo Técnico</h3>
+
+            <input
+              type="text"
+              placeholder="Título do material"
+              value={novoConteudo.titulo}
+              onChange={(e) =>
+                setNovoConteudo({
+                  ...novoConteudo,
+                  titulo: e.target.value,
+                })
+              }
+              className="modal-input"
+            />
+
+            <select
+              value={novoConteudo.tipo}
+              onChange={(e) =>
+                setNovoConteudo({
+                  ...novoConteudo,
+                  tipo: e.target.value,
+                })
+              }
+              className="modal-input"
+            >
+              <option value="pdf">PDF</option>
+              <option value="video">Vídeo</option>
+            </select>
+
+            <input
+              type="file"
+              accept={novoConteudo.tipo === "pdf" ? ".pdf" : "video/*"}
+              onChange={(e) =>
+                setNovoConteudo({
+                  ...novoConteudo,
+                  arquivo: e.target.files[0],
+                })
+              }
+              className="modal-file"
+            />
+
+            <div className="modal-botoes">
+              <button
+                className="botao-secundario"
+                onClick={() => setMostrarModal(false)}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className="botao-primario"
+                onClick={adicionarConteudo}
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

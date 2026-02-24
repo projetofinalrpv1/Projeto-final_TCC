@@ -40,10 +40,6 @@ export function Sidebar({ items, isFechado }) {
             </NavLink>
           ))}
 
-          {/* SEÇÃO DE CONTA - ACESSÍVEL PARA TODOS */}
-          <div className="divisor"></div>
-          <li className="titulo-secao">Conta</li>
-          <div className="divisor"></div>
 
           <NavLink 
             to="/app/configuracoes" 
