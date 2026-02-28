@@ -1,86 +1,104 @@
+import { CreateUserDTO, UpdateUserDTO } from "../schemas/UserSchemas";
 import bcrypt from 'bcrypt';
-import { UserRepository } from '../repositories/UserRepository';
-import { TaskRepository } from '../repositories/TaskRepository'; // Importe aqui
+import { UserRepository } from "../repositories/UserRepository";
+import { AppError } from "../errors/AppError";
 
 export class UserService {
   private userRepository = new UserRepository();
-  private taskRepository = new TaskRepository(); // Instancie aqui
 
-  async executeRegister({ nome, email, senha, cargo, workAreaId }: any) {
-    const userExists = await this.userRepository.findByEmail(email);
-    if (userExists) throw new Error("Este e-mail já está em uso.");
-
-    const hashedPassword = await bcrypt.hash(senha, 10);
-
-    const user = await this.userRepository.create({
-      nome, email, senha: hashedPassword, cargo, workAreaId
-    });
-
-    // 2. BUSCAR TAREFAS DEFAULT (Usando o repositório)
-    const templateTasks = await this.taskRepository.findTemplatesByArea(workAreaId);
-
-    // 3. CLONAR TAREFAS (Usando o repositório)
-    if (templateTasks.length > 0) {
-      const onboardingTasks = templateTasks.map(task => ({
-        titulo: task.titulo,
-        descricao: task.descricao,
-        prioridade: task.prioridade,
-        workAreaId: workAreaId,
-        userId: user.id, 
-        isTemplate: false 
-      }));
-
-      await this.taskRepository.createMany(onboardingTasks);
-    }
-
-    const { senha: _, ...userWithoutPassword } = user;
+  // Helper privado para remover dados sensíveis
+  private sanitizeUser(user: any) {
+    if (!user) return null;
+    const { senha, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
+  async executeCreate(data: CreateUserDTO) {
+    // 1. Validação
+    if (!data.email) throw new AppError("Email é obrigatório.", 400);
+    
+    const userExists = await this.userRepository.findByEmail(data.email);
+    if (userExists) throw new AppError("Este email já está cadastrado.", 409);
+
+    // 2. Processamento
+    const hashedPassword = await bcrypt.hash(data.senha, 10);
+    const userData = { ...data, senha: hashedPassword };
+
+    // 3. Persistência e Retorno
+    const user = await this.userRepository.create(userData);
+    return this.sanitizeUser(user);
+  }
+
   async executeListAll() {
-  const users = await this.userRepository.findAll();
-  
-  // Removemos a senha de todos os usuários da lista por segurança
-  return users.map(({ senha, ...userWithoutPassword }) => userWithoutPassword);
-}
-
-async executeUpdate(id: string, data: any) {
-  // 1. Verificamos se o usuário existe antes de tentar atualizar
-  const userExists = await this.userRepository.findById(id);
-  if (!userExists) {
-    throw new Error("Usuário não encontrado.");
+    const users = await this.userRepository.findAll();
+    return users.map(user => this.sanitizeUser(user));
   }
 
-  // 2. Criamos o objeto de atualização apenas com campos presentes no 'data'
-  // O segredo aqui é que o Prisma ignora chaves que são 'undefined'
-  const updateData: any = {};
-
-  if (data.nome !== undefined) updateData.nome = data.nome;
-  if (data.email !== undefined) updateData.email = data.email;
-  if (data.cargo !== undefined) updateData.cargo = data.cargo;
-  
-  if (data.workAreaId && data.workAreaId.trim() !== "") {
-    updateData.workAreaId = data.workAreaId;
+  async executeListManagers() {
+    const managers = await this.userRepository.findManagers();
+    return managers.map(user => this.sanitizeUser(user));
   }
 
-  if (data.senha && data.senha.trim() !== "") {
-    updateData.senha = await bcrypt.hash(data.senha, 10);
+  async executeGetTeam(managerId: string) {
+    const team = await this.userRepository.findTeamByManager(managerId);
+    
+    return team.map(member => {
+      const totalTasks = member.tasks.length;
+      const completedTasks = member.tasks.filter(t => t.status === 'CONCLUIDO' || t.status === 'DONE').length;
+      
+      const progresso = totalTasks > 0 
+        ? Math.round((completedTasks / totalTasks) * 100) 
+        : 0;
+
+      return {
+        ...this.sanitizeUser(member), // Usa o sanitizador aqui também
+        progresso,
+        totalTasks,
+        completedTasks,
+        workArea: member.workArea?.nome
+      };
+    });
   }
 
-  // 3. Verifica se há algo para atualizar para evitar chamadas inúteis ao banco
-  if (Object.keys(updateData).length === 0) {
-    throw new Error("Nenhum dado fornecido para atualização.");
+  async executeGetDetails(id: string) {
+    const user = await this.userRepository.findById(id);
+    if (!user) throw new AppError("Usuário não encontrado.", 404);
+
+    return this.sanitizeUser(user);
   }
 
-  const updatedUser = await this.userRepository.update(id, updateData);
+  async executePatch(id: string, data: UpdateUserDTO) {
+   
+    const userExists = await this.userRepository.findById(id);
+    if (!userExists) throw new AppError("Usuário não encontrado.", 404);
 
-  const { senha: _, ...userWithoutPassword } = updatedUser;
-  return userWithoutPassword;
-}
+    if (data.senha) {
+      data.senha = await bcrypt.hash(data.senha, 10);
+    }
+    
+    const updatedUser = await this.userRepository.update(id, data);
+    return this.sanitizeUser(updatedUser);
+  }
 
-async executeDelete(id: string) {
-  // Poderíamos verificar se o usuário existe antes de deletar
-  await this.userRepository.delete(id);
-  return { message: "Usuário removido com sucesso" };
-}
+  async executeReplace(id: string, data: CreateUserDTO) {
+    const userExists = await this.userRepository.findById(id);
+    if (!userExists) throw new AppError("Usuário não encontrado.", 404);
+
+    const hashedPassword = await bcrypt.hash(data.senha, 10);
+
+    const updatedUser = await this.userRepository.update(id, {
+      ...data,
+      senha: hashedPassword
+    });
+
+    return this.sanitizeUser(updatedUser);
+  }
+
+  async executeToggleStatus(id: string, isActive: boolean) {
+    const userExists = await this.userRepository.findById(id);
+    if (!userExists) throw new AppError("Usuário não encontrado.", 404);
+
+    const updatedUser = await this.userRepository.update(id, { isActive });
+    return this.sanitizeUser(updatedUser);
+  }
 }

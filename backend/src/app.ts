@@ -7,12 +7,34 @@ import { userRoutes } from './routes/UserRoutes';
 import { workAreaRoutes } from './routes/WorkAreaRoutes';
 import { taskRoutes } from './routes/TaskRoutes';
 import { materialRoutes } from './routes/MaterialRoutes';
-
+import {z} from 'zod'
+import { AppError } from './errors/AppError';
+import fastifyJwt from '@fastify/jwt';
 const app: FastifyInstance = fastify({ 
   logger: true 
 });
 
+app.setErrorHandler((error, request, reply) => {
+  // Erro de Validação do Zod
+  if (error instanceof z.ZodError) {
+    return reply.status(400).send({ message: "Erro de validação", errors: error.format() });
+  }
+
+  // Erro de Negócio (ex: throw new AppError('Usuário não encontrado', 404))
+  if (error instanceof AppError) {
+    return reply.status(error.statusCode).send({ message: error.message });
+  }
+
+  // Erro inesperado (Servidor caiu)
+  request.log.error(error); // Loga o erro real no terminal
+  return reply.status(500).send({ message: "Erro interno no servidor." });
+});
+
 app.register(cors, { origin: '*' });
+
+app.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET || 'supersecretkey', // Mantenha no .env!
+});
 
 app.register(swagger, {
   openapi: {
@@ -31,6 +53,7 @@ app.register(swaggerUi, {
 
 // --- REGISTRO DE ROTAS ---
 app.register(userRoutes, { prefix: '/api' });
+
 app.register(workAreaRoutes, { prefix: '/api' });
 app.register(taskRoutes, { prefix: '/api' });
 app.register(materialRoutes, { prefix: '/api' });
