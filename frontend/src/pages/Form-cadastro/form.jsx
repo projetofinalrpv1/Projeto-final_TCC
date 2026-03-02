@@ -1,8 +1,8 @@
 import { useState } from "react";
 import "./Form.css";
 
+export default function Form({ fechar, adicionarUsuario }) {
 
-export default function Form() {
   const [formData, setFormData] = useState({
     nome: "",
     setor: "",
@@ -12,7 +12,6 @@ export default function Form() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -22,16 +21,8 @@ export default function Form() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("Dados enviados:", formData);
-
-    alert("Cadastro realizado com sucesso!");
-
-    setFormData({
-      nome: "",
-      setor: "",
-      dataInicio: "",
-      gestor: false,
-    });
+    adicionarUsuario(formData);  
+    fechar(); // fecha o modal
   };
 
   return (
@@ -75,9 +66,7 @@ export default function Form() {
                 name="gestor"
                 value="true"
                 checked={formData.gestor === true}
-                onChange={() =>
-                  setFormData({ ...formData, gestor: true })
-                }
+                onChange={() => setFormData({ ...formData, gestor: true })}
               />
               Sim
             </label>
@@ -88,9 +77,7 @@ export default function Form() {
                 name="gestor"
                 value="false"
                 checked={formData.gestor === false}
-                onChange={() =>
-                  setFormData({ ...formData, gestor: false })
-                }
+                onChange={() => setFormData({ ...formData, gestor: false })}
               />
               Não
             </label>
@@ -98,6 +85,8 @@ export default function Form() {
         </div>
 
         <button type="submit">Cadastrar</button>
+        <button type="button" onClick={fechar} className="btn-cancelar">Cancelar</button>
+
       </form>
     </div>
   );
