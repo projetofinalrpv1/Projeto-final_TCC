@@ -13,7 +13,7 @@ export async function workAreaRoutes(app: FastifyInstance) {
             type: 'object',
             properties: {
               id: { type: 'string' },
-              nome: { type: 'string' }
+              name: { type: 'string' }
             }
           }
         }

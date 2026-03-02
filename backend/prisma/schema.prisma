@@ -9,91 +9,64 @@ datasource db {
 
 model User {
   id         String   @id @default(uuid())
-  nome       String
+  name       String
   email      String   @unique
-  senha      String
-  cargo      Cargo    @default(COLABORADOR) // Usando o Enum Cargo
-  
+  password   String   
+  role       String  
   workAreaId String
   workArea   WorkArea @relation(fields: [workAreaId], references: [id])
+  isActive   Boolean  @default(true)
+  
+  managerId  String?
+  manager    User?    @relation("TeamManager", fields: [managerId], references: [id])
+  subordinates User[] @relation("TeamManager")
 
-  // Relação com as tarefas que este usuário é responsável
-  tasks      Task[]   @relation("UserTasks") 
-
+  tasks      Task[]   @relation("UserTasks")
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 
   @@map("users")
 }
 
 model Task {
-  id           String     @id @default(uuid())
-  titulo       String
-  descricao    String?
-  status       Status     @default(PENDENTE)
-  prioridade   Prioridade @default(MEDIA)
-  
-  // Nova lógica:
-  isTemplate   Boolean    @default(false) // Se true, é uma tarefa "default" da área
-  
-  // Relacionamento com a Área
-  workAreaId   String
-  workArea     WorkArea   @relation(fields: [workAreaId], references: [id])
+  id          String   @id @default(uuid())
+  title       String  
+  description String   @db.Text
+  status      String
+  priority    String   
+  isTemplate  Boolean  @default(false)
+  workAreaId  String
 
-  // Relacionamento com o Usuário que vai fazer (Pode ser nulo se for apenas template)
-  userId       String?    @map("user_id") 
-  user         User?      @relation("UserTasks", fields: [userId], references: [id], onDelete: Cascade)
+  userId      String?  @map("user_id")
+  user        User?    @relation("UserTasks", fields: [userId], references: [id], onDelete: Cascade)
 
-  // Quem criou (Gestor ou Admin)
-  creatorId    String?    @map("creator_id")
-  // Note: Para simplificar no Prisma, você pode deixar o creatorId apenas como String por enquanto
-  
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  workArea    WorkArea @relation(fields: [workAreaId], references: [id])
+  createdAt   DateTime @default(now())
 
   @@map("tasks")
 }
 
 model WorkArea {
-  id    String @id @default(uuid())
-  nome  String @unique
-  users User[]
-  tasks Task[] // <--- Adicione esta linha
+  id        String     @id @default(uuid())
+  name      String     @unique
+  users     User[]
+  tasks     Task[]
   materials Material[]
+
   @@map("work_areas")
 }
 
 model Material {
-  id          String   @id @default(uuid())
-  titulo      String
-  gestor      String
-  descricao   String   @db.Text
-  arquivoUrl  String   @db.Text
-  rota        String?  // <-- ADICIONE ESTA LINHA (o ? torna opcional)
-  workAreaId  String
-  workArea    WorkArea @relation(fields: [workAreaId], references: [id])
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(uuid())
+  title      String  
+  manager    String   
+  description String  @db.Text
+  fileUrl    String    @db.Text
+  route      String?  
+  workAreaId String
+  workArea   WorkArea @relation(fields: [workAreaId], references: [id])
 
-  @@map("materials") 
-}
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-// --- ENUMS ---
-enum Cargo {
-  GESTOR
-  COLABORADOR
-  ADMIN
-}
-
-enum Status {
-  PENDENTE
-  EM_ANDAMENTO
-  CONCLUIDA
-}
-
-enum Prioridade {
-  BAIXA
-  MEDIA
-  ALTA
+  @@map("materials")
 }

@@ -1,51 +1,49 @@
 import { prisma } from '../lib/prisma';
 
 export class MaterialRepository {
-  // Cria o material com todos os novos campos
+  // Agora os parâmetros seguem o padrão inglês
   async create(data: {
-    titulo: string;
-    gestor: string;
-    descricao: string;
-    arquivoUrl: string;
+    title: string;
+    manager: string;
+    description: string;
+    fileUrl: string;
     workAreaId: string;
-    rota?: string;
+    route?: string;
   }) {
     return await prisma.material.create({
       data: {
-        titulo: data.titulo,
-        gestor: data.gestor,
-        descricao: data.descricao,
-        arquivoUrl: data.arquivoUrl,
+        title: data.title,
+        manager: data.manager,
+        description: data.description,
+        fileUrl: data.fileUrl,
         workAreaId: data.workAreaId,
-        rota: data.rota || "",
+        route: data.route || "",
       },
     });
   }
 
-  // Lista todos os materiais de uma área específica
   async findByArea(workAreaId: string) {
     return await prisma.material.findMany({
       where: {
         workAreaId: workAreaId,
       },
       orderBy: {
-        createdAt: 'desc', 
+        createdAt: 'desc',
       },
     });
   }
 
-  // NOVO MÉTODO: Busca materiais da área "Geral" para servir de padrão
   async findDefaultMaterials() {
     return await prisma.material.findMany({
       where: {
         workArea: {
-          nome: "Geral" // Filtra pela área que criamos no Seed
+          name: "Geral" // O nome aqui se refere ao property 'name' da WorkArea
         }
       },
       include: {
         workArea: {
           select: {
-            nome: true,
+            name: true, // Aqui também mudamos para inglês
           },
         },
       },
@@ -55,16 +53,13 @@ export class MaterialRepository {
     });
   }
 
-  // Busca os detalhes de um material pelo ID (Para a página de detalhes)
   async findById(id: string) {
     return await prisma.material.findUnique({
-      where: {
-        id: id,
-      },
+      where: { id },
       include: {
         workArea: {
           select: {
-            nome: true, 
+            name: true,
           },
         },
       },
@@ -72,8 +67,8 @@ export class MaterialRepository {
   }
 
   async delete(id: string) {
-  return await prisma.material.delete({
-    where: { id }
-  });
-}
+    return await prisma.material.delete({
+      where: { id }
+    });
+  }
 }

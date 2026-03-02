@@ -1,115 +1,154 @@
 import { FastifyInstance } from 'fastify';
-import { createUser, listUsers, updateUser, deleteUser } from '../controllers/UserController';
+import { createUser, listUsers, listManagers, replaceUser, deactivateUser, patchUser } from '../controllers/UserController';
 
 export async function userRoutes(app: FastifyInstance) {
+
   app.post('/users', {
     schema: {
-      tags: ['Usuários'],
-      summary: 'Cadastrar novo colaborador',
+      tags: ['Users'],
+      summary: 'Register a new collaborator or manager',
       body: {
         type: 'object',
-        required: ['nome', 'email', 'senha', 'cargo', 'workAreaId'],
+        required: ['name', 'email', 'password', 'role', 'workAreaId'],
         properties: {
-  nome: { type: 'string' }, // Removi o 'example' para evitar conflito
-  email: { type: 'string', format: 'email' },
-  senha: { type: 'string', minLength: 6 },
-  cargo: { 
-    type: 'string', 
-    enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] 
-  },
-  workAreaId: { 
-    type: 'string', 
-    description: 'UUID da área' 
-  }
-}
+          name: { type: 'string' },
+          email: { type: 'string', format: 'email' },
+          password: { type: 'string', minLength: 6 },
+          role: { type: 'string', enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] },
+          workAreaId: { type: 'string', format: 'uuid' },
+          managerId: { type: 'string', format: 'uuid', nullable: true }
+        }
       },
       response: {
         201: {
-          description: 'Usuário criado com sucesso',
+          description: 'User created successfully',
           type: 'object',
           properties: {
-            id: { type: 'string' },
-            nome: { type: 'string' },
-            email: { type: 'string' }
+            id: { type: 'string', format: 'uuid' },
+            name: { type: 'string' },
+            email: { type: 'string' },
+            role: { type: 'string' },
+            managerId: { type: 'string', nullable: true }
           }
         }
       }
     }
   }, createUser);
 
-app.get('/users', {
-  schema: {
-    tags: ['Usuários'],
-    summary: 'Listar todos os usuários',
-    response: {
-      200: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            nome: { type: 'string' },
-            email: { type: 'string' },
-            cargo: { type: 'string' },
-            workAreaId: { type: 'string' },
-            workArea: {
-              type: 'object',
-              properties: {
-                id: { type: 'string' },
-                nome: { type: 'string' }
+  app.get('/users', {
+    schema: {
+      tags: ['Users'],
+      summary: 'List all users',
+      response: {
+        200: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              name: { type: 'string' },
+              email: { type: 'string' },
+              role: { type: 'string' },
+              workArea: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string', format: 'uuid' },
+                  name: { type: 'string' }
+                }
               }
             }
           }
         }
       }
     }
-  }
-}, listUsers);
+  }, listUsers);
 
-// UserRoutes.ts
-app.put('/users/:id', {
-  schema: {
-    tags: ['Usuários'],
-    summary: 'Atualizar dados do usuário (incluindo senha)',
-    params: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'ID do usuário' }
-      }
-    },
-    body: {
-      type: 'object',
-      properties: {
-        nome: { type: 'string' },
-        email: { type: 'string' },
-        senha: { type: 'string', minLength: 6, description: 'Deixe vazio se não quiser mudar' },
-        cargo: { type: 'string', enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] },
-        workAreaId: { type: 'string' }
-      }
-    }
-  }
-}, updateUser);
-
-app.delete('/users/:id', {
-  schema: {
-    tags: ['Usuários'],
-    summary: 'Remover um usuário do sistema',
-    params: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'ID UUID do usuário' }
-      },
-      required: ['id']
-    },
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' }
+  app.get('/users/managers', {
+    schema: {
+      tags: ['Users'],
+      summary: 'List managers',
+      response: {
+        200: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              name: { type: 'string' },
+              workArea: { type: 'object', properties: { name: { type: 'string' } } }
+            }
+          }
         }
       }
     }
-  }
-}, deleteUser);
-}
+  }, listManagers);
 
+  app.put('/users/:id', {
+    schema: {
+      tags: ['Users'],
+      summary: 'Update user data',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string', format: 'uuid' }
+        }
+      },
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          email: { type: 'string', format: 'email' },
+          password: { type: 'string', minLength: 6 },
+          role: { type: 'string', enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] },
+          workAreaId: { type: 'string', format: 'uuid' }
+        }
+      }
+    }
+  }, replaceUser);
+
+  app.patch('/users/:id', {
+    schema: {
+      tags: ['Users'],
+      summary: 'Partial user data update',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string', format: 'uuid' }
+        }
+      },
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          email: { type: 'string', format: 'email' },
+          password: { type: 'string', minLength: 6 },
+          role: { type: 'string', enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] },
+          workAreaId: { type: 'string', format: 'uuid' },
+          isActive: { type: 'boolean' }
+        }
+      }
+    }
+  }, patchUser);
+
+  app.delete('/users/:id', {
+    schema: {
+      tags: ['Users'],
+      summary: 'Deactivate user (Soft Delete)',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string', format: 'uuid' }
+        }
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: { message: { type: 'string' } }
+        }
+      }
+    }
+  }, deactivateUser);
+}

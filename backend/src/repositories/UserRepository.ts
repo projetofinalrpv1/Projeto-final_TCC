@@ -1,22 +1,15 @@
 import { prisma } from '../lib/prisma';
+import { Prisma } from '@prisma/client'; // Importante: Importar os tipos gerados
 
 export class UserRepository {
-  async create(data: any) {
-    return await prisma.user.create({
-      data: {
-        nome: data.nome,
-        email: data.email,
-        senha: data.senha,
-        cargo: data.cargo,
-        workAreaId: data.workAreaId 
-      }
-    });
+  // Agora o TypeScript sabe exatamente quais campos são obrigatórios
+  async create(data: Prisma.UserCreateInput) {
+    return await prisma.user.create({ data });
   }
 
   async findByEmail(email: string) {
     return await prisma.user.findUnique({ where: { email } });
   }
-
 
   async findById(id: string) {
     return await prisma.user.findUnique({ 
@@ -27,23 +20,47 @@ export class UserRepository {
 
   async findAll() {
     return await prisma.user.findMany({
+      where: { isActive: true },
+      include: { workArea: true }
+    });
+  }
+
+  // Usamos UserUpdateInput para que o TS valide apenas campos editáveis
+  async update(id: string, data: Prisma.UserUpdateInput) {
+    return await prisma.user.update({
+      where: { id },
+      data: data,
+    });
+  }
+
+  async deactivate(id: string) {
+    return await prisma.user.update({
+      where: { id },
+      data: { isActive: false }
+    });
+  }
+
+  async findTeamByManager(managerId: string) {
+    return await prisma.user.findMany({
+      where: { managerId: managerId },
       include: {
-        workArea: true 
+        tasks: {
+          select: { status: true }
+        }
       }
     });
   }
 
-  // Atualizado para aceitar o objeto dinâmico 'data' que o seu Service filtrará
-  async update(id: string, data: any) {
-    return await prisma.user.update({
-      where: { id },
-      data: data, // O Prisma só atualizará os campos presentes neste objeto
-    });
-  }
-
-  async delete(id: string) {
-    return await prisma.user.delete({
-      where: { id },
+  async findManagers() {
+    return await prisma.user.findMany({
+      where: { role: 'GESTOR' },
+      select: {
+        id: true,
+        name: true,
+        workArea: { select: { name: true } }
+      }
     });
   }
 }
+
+export const userRepository = new UserRepository();
