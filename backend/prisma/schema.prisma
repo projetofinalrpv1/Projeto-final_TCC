@@ -9,47 +9,47 @@ datasource db {
 
 model User {
   id         String   @id @default(uuid())
-  nome       String
+  name       String
   email      String   @unique
-  senha      String
-  cargo      String
+  password   String   
+  role       String  
   workAreaId String
   workArea   WorkArea @relation(fields: [workAreaId], references: [id])
-  isActive Boolean @default(true)
+  isActive   Boolean  @default(true)
   
-  // --- HIERARQUIA (Self-relation) ---
-  managerId    String?
-  manager      User?   @relation("TeamManager", fields: [managerId], references: [id])
-  subordinates User[]  @relation("TeamManager")
+  managerId  String?
+  manager    User?    @relation("TeamManager", fields: [managerId], references: [id])
+  subordinates User[] @relation("TeamManager")
 
-  // --- RELAÇÃO COM TAREFAS (Ajustada para casar com Task) ---
-  tasks Task[] @relation("UserTasks") // Adicionamos o nome "UserTasks" aqui!
+  tasks      Task[]   @relation("UserTasks")
+  createdAt  DateTime @default(now())
 
-  createdAt DateTime @default(now())
+  @@map("users")
 }
 
 model Task {
-  id         String  @id @default(uuid())
-  titulo     String
-  descricao  String
-  status     String // Ou Enum se você já tiver criado
-  prioridade String
-  isTemplate Boolean @default(false)
-  workAreaId String
+  id          String   @id @default(uuid())
+  title       String  
+  description String   @db.Text
+  status      String
+  priority    String   
+  isTemplate  Boolean  @default(false)
+  workAreaId  String
 
-  // Relação com Usuário (Dono da Task)
-  userId String? @map("user_id")
-  user   User?   @relation("UserTasks", fields: [userId], references: [id], onDelete: Cascade)
+  userId      String?  @map("user_id")
+  user        User?    @relation("UserTasks", fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  workArea  WorkArea @relation(fields: [workAreaId], references: [id])
+  workArea    WorkArea @relation(fields: [workAreaId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@map("tasks")
 }
 
 model WorkArea {
   id        String     @id @default(uuid())
-  nome      String     @unique
+  name      String     @unique
   users     User[]
-  tasks     Task[] // <--- Adicione esta linha
+  tasks     Task[]
   materials Material[]
 
   @@map("work_areas")
@@ -57,35 +57,16 @@ model WorkArea {
 
 model Material {
   id         String   @id @default(uuid())
-  titulo     String
-  gestor     String
-  descricao  String   @db.Text
-  arquivoUrl String   @db.Text
-  rota       String? // <-- ADICIONE ESTA LINHA (o ? torna opcional)
+  title      String  
+  manager    String   
+  description String  @db.Text
+  fileUrl    String    @db.Text
+  route      String?  
   workAreaId String
   workArea   WorkArea @relation(fields: [workAreaId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("materials")
-}
-
-// --- ENUMS ---
-enum Cargo {
-  GESTOR
-  COLABORADOR
-  ADMIN
-}
-
-enum Status {
-  PENDENTE
-  EM_ANDAMENTO
-  CONCLUIDA
-}
-
-enum Prioridade {
-  BAIXA
-  MEDIA
-  ALTA
 }

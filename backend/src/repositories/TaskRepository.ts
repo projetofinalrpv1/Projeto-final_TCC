@@ -4,10 +4,10 @@ export class TaskRepository {
   async create(data: any) {
   return await prisma.task.create({
     data: {
-      titulo: data.titulo,
-      descricao: data.descricao,
+      title: data.title,
+      description: data.description,
       status: data.status,
-      prioridade: data.prioridade,
+      priority: data.priority,
       isTemplate: data.isTemplate || false, 
       workAreaId: data.workAreaId,
       userId: data.userId || null   // Pode ser nulo se for template
@@ -19,7 +19,7 @@ export class TaskRepository {
     return await prisma.task.findMany({
       include: {
         user: {
-          select: { nome: true, email: true, cargo: true } // Traz dados do dono da task
+          select: { name: true, email: true, role: true } // Traz dados do dono da task
         }
       }
     });

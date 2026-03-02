@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 // Schema base
 export const createUserSchema = z.object({
-  nome: z.string().min(3),
+  name: z.string().min(3),
   email: z.string().email(),
-  senha: z.string().min(6),
-  cargo: z.enum(['COLABORADOR', 'GESTOR', 'ADMIN']),
+  password: z.string().min(6),
+  role: z.enum(['COLABORADOR', 'GESTOR', 'ADMIN']),
   workAreaId: z.string().uuid(),
   managerId: z.string().uuid().optional().nullable(),
 });
@@ -15,7 +15,7 @@ export type CreateUserDTO = z.infer<typeof createUserSchema>;
 
 // Schema de Patch (Partial)
 export const patchUserSchema = createUserSchema.partial().extend({
-  senha: z.string().min(6).optional().nullable(),
+  password: z.string().min(6).optional().nullable(),
   // Adicione isso aqui para o Zod aceitar o campo:
   isActive: z.boolean().optional(),
 });

@@ -1,16 +1,15 @@
 import { prisma } from '../lib/prisma';
+import { Prisma } from '@prisma/client'; // Importante: Importar os tipos gerados
 
 export class UserRepository {
-async create(data: any) {
-  return await prisma.user.create({
-    data: data
-  });
-}
+  // Agora o TypeScript sabe exatamente quais campos são obrigatórios
+  async create(data: Prisma.UserCreateInput) {
+    return await prisma.user.create({ data });
+  }
 
   async findByEmail(email: string) {
     return await prisma.user.findUnique({ where: { email } });
   }
-
 
   async findById(id: string) {
     return await prisma.user.findUnique({ 
@@ -20,52 +19,48 @@ async create(data: any) {
   }
 
   async findAll() {
-  return await prisma.user.findMany({
-    where: { isActive: true }, // Só traz os ativos
-    include: { workArea: true }
-  });
-}
-
-  // Atualizado para aceitar o objeto dinâmico 'data' que o seu Service filtrará
-  async update(id: string, data: any) {
-    return await prisma.user.update({
-      where: { id },
-      data: data, // O Prisma só atualizará os campos presentes neste objeto
+    return await prisma.user.findMany({
+      where: { isActive: true },
+      include: { workArea: true }
     });
   }
 
- async deactivate(id: string) {
-  return await prisma.user.update({
-    where: { id },
-    data: { isActive: false } // Apenas desativa
-  });
-}
+  // Usamos UserUpdateInput para que o TS valide apenas campos editáveis
+  async update(id: string, data: Prisma.UserUpdateInput) {
+    return await prisma.user.update({
+      where: { id },
+      data: data,
+    });
+  }
+
+  async deactivate(id: string) {
+    return await prisma.user.update({
+      where: { id },
+      data: { isActive: false }
+    });
+  }
 
   async findTeamByManager(managerId: string) {
-  return await prisma.user.findMany({
-    where: {
-      managerId: managerId
-    },
-    include: {
-      tasks: {
-        select: {
-          status: true // Para o front calcular % de conclusão
+    return await prisma.user.findMany({
+      where: { managerId: managerId },
+      include: {
+        tasks: {
+          select: { status: true }
         }
       }
-    }
-  });
+    });
+  }
+
+  async findManagers() {
+    return await prisma.user.findMany({
+      where: { role: 'GESTOR' },
+      select: {
+        id: true,
+        name: true,
+        workArea: { select: { name: true } }
+      }
+    });
+  }
 }
 
-async findManagers() {
-  return await prisma.user.findMany({
-    where: { 
-      cargo: 'GESTOR' 
-    },
-    select: {
-      id: true,
-      nome: true,
-      workArea: { select: { nome: true } } // Bom para mostrar ao lado do nome no Select
-    }
-  });
-}
-}
+export const userRepository = new UserRepository();

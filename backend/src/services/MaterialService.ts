@@ -11,12 +11,12 @@ export class MaterialService {
     if (!data.arquivoUrl) throw new Error("O link do arquivo (Drive) é obrigatório.");
 
     return await this.materialRepository.create({
-      titulo: data.titulo,
-      gestor: data.gestor,
-      descricao: data.descricao || "", 
-      arquivoUrl: data.arquivoUrl,
+      title: data.title,
+      manager: data.manager,
+      description: data.description || "", 
+      fileUrl: data.fileUrl,
       workAreaId: data.workAreaId,
-      rota: data.rota
+      route: data.route
     });
   }
 
