@@ -1,9 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import { createUser, listUsers, listManagers, replaceUser, deactivateUser, patchUser } from '../controllers/UserController';
-
+import { verifyRole } from '../hooks/checkPermissions';
 export async function userRoutes(app: FastifyInstance) {
 
   app.post('/users', {
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN'])],
     schema: {
       tags: ['Users'],
       summary: 'Register a new collaborator or manager',
@@ -36,6 +37,7 @@ export async function userRoutes(app: FastifyInstance) {
   }, createUser);
 
   app.get('/users', {
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN'])],
     schema: {
       tags: ['Users'],
       summary: 'List all users',
@@ -64,6 +66,7 @@ export async function userRoutes(app: FastifyInstance) {
   }, listUsers);
 
   app.get('/users/managers', {
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN'])],
     schema: {
       tags: ['Users'],
       summary: 'List managers',
@@ -84,6 +87,7 @@ export async function userRoutes(app: FastifyInstance) {
   }, listManagers);
 
   app.put('/users/:id', {
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN'])],
     schema: {
       tags: ['Users'],
       summary: 'Update user data',
@@ -108,6 +112,7 @@ export async function userRoutes(app: FastifyInstance) {
   }, replaceUser);
 
   app.patch('/users/:id', {
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN'])],
     schema: {
       tags: ['Users'],
       summary: 'Partial user data update',
@@ -133,6 +138,7 @@ export async function userRoutes(app: FastifyInstance) {
   }, patchUser);
 
   app.delete('/users/:id', {
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN'])],
     schema: {
       tags: ['Users'],
       summary: 'Deactivate user (Soft Delete)',

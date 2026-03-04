@@ -3,65 +3,65 @@ import { createTask, listTasks, updateTaskStatus, deleteTask } from '../controll
 import { verifyRole } from '../hooks/checkPermissions';
 
 export async function taskRoutes(app: FastifyInstance) {
-  // 1. Proteção Global: Todas as rotas abaixo exigem autenticação
+  // 1. Global Protection: All routes below require authentication
   app.addHook('onRequest', app.authenticate);
 
-  // 2. Criar Tarefa (Restrito: GESTOR ou ADMIN)
+  // 2. Create Task (Restricted: GESTOR or ADMIN)
   app.post('/tasks', {
     onRequest: [(request, reply) => verifyRole(request, reply, ['GESTOR', 'ADMIN'])],
     schema: {
-      tags: ['Tarefas'],
-      summary: 'Criar uma nova tarefa',
+      tags: ['Tasks'],
+      summary: 'Create a new task',
       body: {
         type: 'object',
-        required: ['titulo', 'workAreaId'],
+        required: ['title', 'workAreaId'],
         properties: {
-          titulo: { type: 'string' },
-          descricao: { type: 'string' },
+          title: { type: 'string' },
+          description: { type: 'string' },
           isTemplate: { type: 'boolean', default: false },
           workAreaId: { type: 'string' },
-          userId: { type: 'string', description: 'Opcional se for template' },
-          prioridade: { type: 'string', enum: ['BAIXA', 'MEDIA', 'ALTA'] }
+          userId: { type: 'string', description: 'Optional if is a template' },
+          priority: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH'] }
         }
       }
     }
   }, createTask);
 
-  // 3. Listar Tarefas (Liberado para todos os autenticados)
+  // 3. List Tasks (Available for all authenticated users)
   app.get('/tasks', {
     schema: {
-      tags: ['Tarefas'],
-      summary: 'Listar todas as tarefas'
+      tags: ['Tasks'],
+      summary: 'List all tasks'
     }
   }, listTasks);
 
-  // 4. Atualizar Status (Liberado para todos os autenticados)
+  // 4. Update Status (Available for all authenticated users)
   app.patch('/tasks/:id/status', {
     schema: {
-      tags: ['Tarefas'],
-      summary: 'Atualizar status ou prioridade de uma tarefa',
+      tags: ['Tasks'],
+      summary: 'Update task status or priority',
       params: {
         type: 'object',
         properties: {
-          id: { type: 'string', description: 'ID da tarefa' }
+          id: { type: 'string', description: 'Task ID' }
         }
       },
       body: {
         type: 'object',
         properties: {
-          status: { type: 'string', enum: ['PENDENTE', 'EM_ANDAMENTO', 'CONCLUIDA'] },
-          prioridade: { type: 'string', enum: ['BAIXA', 'MEDIA', 'ALTA'] }
+          status: { type: 'string', enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED'] },
+          priority: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH'] }
         }
       }
     }
   }, updateTaskStatus);
 
-  // 5. Deletar Tarefa (Restrito: GESTOR ou ADMIN)
+  // 5. Delete Task (Restricted: GESTOR or ADMIN)
   app.delete('/tasks/:id', {
     onRequest: [(request, reply) => verifyRole(request, reply, ['GESTOR', 'ADMIN'])],
     schema: {
-      summary: 'Deleta uma tarefa específica',
-      tags: ['Tarefas'],
+      summary: 'Delete a specific task',
+      tags: ['Tasks'],
       params: {
         type: 'object',
         properties: {

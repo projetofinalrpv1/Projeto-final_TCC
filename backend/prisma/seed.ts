@@ -1,7 +1,26 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcrypt'
 const prisma = new PrismaClient()
 
 async function main() {
+
+  const hashedPassword = await bcrypt.hash('Admin123!', 8) // Defina uma senha inicial forte
+  
+  await prisma.user.upsert({
+  where: { email: 'admin@empresa.com' },
+  update: {},
+  create: {
+    email: 'admin@empresa.com',
+    name: 'Administrador do Sistema',
+    password: hashedPassword,
+    role: 'ADMIN',
+    // Conecta o usuário a área "Geral" que você já criou acima
+    workArea: {
+      connect: { name: 'Geral' } 
+    }
+  },
+})
+  console.log('✅ Admin verificado/criado com sucesso.')
   // 1. Definição das Áreas (agora usando 'name')
   const areas = [
     { id: "7684be2b-074c-45cf-9d07-99d9d0b41202", name: "TI" },

@@ -1,9 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import { createMaterial, listMaterialByArea, getMaterialDetails, deleteMaterial} from '../controllers/MaterialController';
-
+import { verifyRole, verifyWorkArea } from '../hooks/checkPermissions';
 export async function materialRoutes(app: FastifyInstance) {
   
   app.post('/materials', {
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
     schema: {
       tags: ['Materiais'],
       summary: 'Adicionar novo material de apoio',
@@ -35,6 +36,10 @@ export async function materialRoutes(app: FastifyInstance) {
   }, createMaterial);
 
   app.get('/materials/:workAreaId', {
+   onRequest: [
+      (req, rep) => verifyRole(req, rep, ['ADMIN', 'GESTOR', 'COLABORADOR']),
+      verifyWorkArea // Só permite se o workAreaId da URL bater com o do token
+    ],
     schema: {
       tags: ['Materiais'],
       summary: 'Listar materiais por área',
@@ -64,6 +69,7 @@ export async function materialRoutes(app: FastifyInstance) {
   }, listMaterialByArea);
 
   app.get('/materials/detalhes/:id', {
+  onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
   schema: {
     tags: ['Materiais'],
     summary: 'Busca todos os dados de um material específico pelo ID',
@@ -77,7 +83,8 @@ export async function materialRoutes(app: FastifyInstance) {
 }, getMaterialDetails);
 
 app.delete('/materials/:id', {
-    schema: {
+  onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
+  schema: {
     summary: 'Deleta um material permanentemente',
     description: 'Remove o material do banco de dados usando o ID fornecido.',
     tags: ['Materiais'],

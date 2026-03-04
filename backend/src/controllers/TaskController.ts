@@ -2,19 +2,18 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { TaskService } from '../services/TaskService';
 
 export const createTask = async (request: FastifyRequest, reply: FastifyReply) => {
-  const taskService = new TaskService();
-  
-  // 1. Extraímos os dados do corpo (excluímos o userId se ele vier, para evitar spoofing)
-  const data = request.body as any; 
-  
-  // 2. Extraímos o ID do usuário diretamente do "crachá" assinado (JWT)
+  // Desestruturamos para garantir que pegamos apenas o que esperamos
+  const { title, description, isTemplate, workAreaId, priority } = request.body as any;
   const userId = request.user.sub; 
-
+    const taskService = new TaskService();
   try {
-    // 3. Unimos os dados do corpo com o ID seguro do token
     const task = await taskService.executeCreate({
-      ...data,
-      userId // Sobrescrevemos ou adicionamos o userId real aqui
+      title,
+      description,
+      isTemplate: isTemplate ?? false,
+      workAreaId,
+      priority: priority || 'MEDIUM', // Valor default caso não enviem
+      userId
     });
     
     return reply.status(201).send(task);

@@ -1,53 +1,61 @@
-// src/services/MaterialService.ts
-
 import { MaterialRepository } from "../repositories/MaterialRepository";
+import { AppError } from "../errors/AppError";
 
 export class MaterialService {
   private materialRepository = new MaterialRepository();
 
-  async executeCreate(data: any) {
-    if (!data.titulo) throw new Error("O título é obrigatório.");
-    if (!data.workAreaId) throw new Error("A área é obrigatória.");
-    if (!data.arquivoUrl) throw new Error("O link do arquivo (Drive) é obrigatório.");
+  // Camada de Cofre: Verifica se o usuário tem autoridade sobre o recurso
+  private async checkOwnership(user: any, materialId: string) {
+    const material = await this.materialRepository.findById(materialId);
+    
+    if (!material) throw new AppError("Material não encontrado.", 404);
+    
+    // ADMIN ignora restrição de área
+    if (user.role === 'ADMIN') return material; 
+    
+    // GESTOR só pode mexer se o material for da área dele
+    if (user.role === 'GESTOR' && material.workAreaId === user.workAreaId) {
+      return material;
+    }
+
+    throw new AppError("Acesso negado: Você não tem permissão para manipular este material.", 403);
+  }
+
+  async executeCreate(data: any, user: any) {
+    // Regra de negócio: Gestor não pode criar algo fora da sua área
+    if (user.role === 'GESTOR' && data.workAreaId !== user.workAreaId) {
+      throw new AppError("Você não pode criar materiais para áreas que não gerencia.", 403);
+    }
+
+    if (!data.titulo || !data.workAreaId || !data.arquivoUrl) {
+      throw new AppError("Dados obrigatórios faltando (título, área ou link).", 400);
+    }
 
     return await this.materialRepository.create({
-      title: data.title,
-      manager: data.manager,
-      description: data.description || "", 
-      fileUrl: data.fileUrl,
+      title: data.titulo,
+      manager: data.gestor,
+      description: data.descricao || "",
+      fileUrl: data.arquivoUrl,
       workAreaId: data.workAreaId,
-      route: data.route
+      route: data.rota
     });
+  }
+
+  async executeListByArea(workAreaId: string) {
+    const specificMaterials = await this.materialRepository.findByArea(workAreaId);
+    const defaultMaterials = await this.materialRepository.findDefaultMaterials();
+    return [...specificMaterials, ...defaultMaterials];
   }
 
   async executeGetDetails(id: string) {
     const material = await this.materialRepository.findById(id);
-    if (!material) throw new Error("Material não encontrado.");
+    if (!material) throw new AppError("Material não encontrado.", 404);
     return material;
   }
 
-   async executeListByArea(workAreaId: string) {
-  // 1. Busca os materiais da área específica (ex: TI)
-     const specificMaterials = await this.materialRepository.findByArea(workAreaId);
-  
-  // 2. Busca os materiais padrão (Área Geral)
-     const defaultMaterials = await this.materialRepository.findDefaultMaterials();
-
-  // 3. Une as duas listas
-  // Usamos o Spread Operator (...) para criar um único array com tudo
-     const allMaterials = [...specificMaterials, ...defaultMaterials];
-
-   return allMaterials;
-}
-
-async executeDelete(id: string) {
-  // Verifica se o material existe
-  const material = await this.materialRepository.findById(id);
-
-  if (!material) {
-    throw new Error("Material não encontrado.");
+  async executeDelete(id: string, user: any) {
+    // Só deleta se o checkOwnership passar
+    await this.checkOwnership(user, id);
+    return await this.materialRepository.delete(id);
   }
-
-  return await this.materialRepository.delete(id);
-}
 }
