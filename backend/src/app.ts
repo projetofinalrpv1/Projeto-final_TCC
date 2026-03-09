@@ -13,6 +13,7 @@ import { userRoutes } from './routes/UserRoutes';
 import { workAreaRoutes } from './routes/WorkAreaRoutes';
 import { taskRoutes } from './routes/TaskRoutes';
 import { materialRoutes } from './routes/MaterialRoutes';
+import { signatureRoutes } from './routes/SignatureRoutes';
 
 const app: FastifyInstance = fastify({ logger: true });
 
@@ -28,10 +29,10 @@ app.setErrorHandler((error, request, reply) => {
   return reply.status(500).send({ message: "Erro interno no servidor." });
 });
 
-app.addHook('onRequest', async (request, reply) => {
-  console.log('--- HEADERS RECEBIDOS PELO SERVIDOR ---');
-  console.log(request.headers); 
-});
+// app.addHook('onRequest', async (request, reply) => {
+//   console.log('--- HEADERS RECEBIDOS PELO SERVIDOR ---');
+//   console.log(request.headers); 
+// });
 
 // 2. Plugins de Infraestrutura
 app.register(cors, { origin: '*' });
@@ -72,7 +73,7 @@ app.register(userRoutes, { prefix: '/api' });
 app.register(workAreaRoutes, { prefix: '/api' });
 app.register(taskRoutes, { prefix: '/api' });
 app.register(materialRoutes, { prefix: '/api' });
-
+app.register(signatureRoutes, {prefix: '/api'}) 
 app.get('/healthcheck', async () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });

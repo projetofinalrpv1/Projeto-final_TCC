@@ -63,4 +63,13 @@ export class TaskRepository {
       where: { id }
     });
   }
+
+  async findByWorkArea(workAreaId: string) {
+  return await prisma.task.findMany({
+    where: { workAreaId }
+  });
+
+  
+}
+
 }

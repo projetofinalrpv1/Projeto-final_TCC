@@ -1,14 +1,15 @@
 import { FastifyInstance } from 'fastify';
 import { createTask, listTasks, updateTaskStatus, deleteTask } from '../controllers/TaskController';
 import { verifyRole } from '../hooks/checkPermissions';
-
+import { finalizeChecklist } from '../controllers/TaskController';
 export async function taskRoutes(app: FastifyInstance) {
   // 1. Global Protection: All routes below require authentication
   app.addHook('onRequest', app.authenticate);
 
   // 2. Create Task (Restricted: GESTOR or ADMIN)
   app.post('/tasks', {
-    onRequest: [(request, reply) => verifyRole(request, reply, ['GESTOR', 'ADMIN'])],
+    onRequest: [app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['GESTOR', 'ADMIN'])],
     schema: {
       tags: ['Tasks'],
       summary: 'Create a new task',

@@ -17,6 +17,10 @@ export class UserRepository {
       include: { workArea: true } 
     });
   }
+  
+  async findManyByRole(role: string) {
+  return await prisma.user.findMany({ where: { role } });
+}
 
   async findAll() {
     return await prisma.user.findMany({
@@ -61,6 +65,8 @@ export class UserRepository {
       }
     });
   }
+
+
 }
 
 export const userRepository = new UserRepository();

@@ -2,7 +2,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export async function verifyRole(request: FastifyRequest, reply: FastifyReply, allowedRoles: string[]) {
-  const { role } = request.user; // Pego do JWT decodificado
+  // 1. Verificação de segurança extra: se o usuário nem existe, barramos aqui.
+  if (!request.user) {
+    return reply.status(401).send({ message: "Usuário não autenticado." });
+  }
+
+  const { role } = request.user; 
+  console.log("Conteúdo do request.user:", JSON.stringify(request.user, null, 2));
   if (!allowedRoles.includes(role)) {
     return reply.status(403).send({ message: "Seu perfil não tem permissão para isso." });
   }

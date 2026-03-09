@@ -1,5 +1,4 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { z } from 'zod';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { UserService } from '../services/UserService';
 import { createUserSchema, patchUserSchema, putUserSchema } from '../schemas/UserSchemas';
 
@@ -8,7 +7,8 @@ const userService = new UserService();
 
 export const createUser = async (request: FastifyRequest, reply: FastifyReply) => {
   const data = createUserSchema.parse(request.body);
-  const user = await userService.executeCreate(data); 
+  // Passamos o request.user para o Service validar se o solicitante é ADMIN
+  const user = await userService.executeCreate(data, request.user); 
   return reply.status(201).send(user);
 };
 
@@ -21,7 +21,8 @@ export const patchUser = async (request: FastifyRequest, reply: FastifyReply) =>
   const { id } = request.params as { id: string };
   const data = patchUserSchema.parse(request.body);
   
-  const user = await userService.executePatch(id, data);
+  // O Service agora verifica se o 'request.user' é o dono do ID ou um ADMIN
+  const user = await userService.executePatch(id, data, request.user);
   return reply.status(200).send(user);
 };
 
@@ -29,14 +30,16 @@ export const replaceUser = async (request: FastifyRequest, reply: FastifyReply) 
   const { id } = request.params as { id: string };
   const data = putUserSchema.parse(request.body);
   
-  const user = await userService.executeReplace(id, data);
+  // Adicione a validação de permissão aqui também, conforme necessário
+  const user = await userService.executeReplace(id, data, request.user);
   return reply.status(200).send(user);
 };
 
 export const deactivateUser = async (request: FastifyRequest, reply: FastifyReply) => {
   const { id } = request.params as { id: string };
-  // Usando o toggleStatus que criamos no Service
-  const user = await userService.executeToggleStatus(id, false);
+  
+  // Passamos o requester para o service validar a autorização
+  const user = await userService.executeToggleStatus(id, false, request.user);
   return reply.status(200).send({ message: "Usuário desativado com sucesso.", user });
 };
 

@@ -22,8 +22,9 @@ model User {
   subordinates User[] @relation("TeamManager")
 
   tasks      Task[]   @relation("UserTasks")
+  employeeSignatures SignatureProcess[] @relation("EmployeeSignatures")
   createdAt  DateTime @default(now())
-
+ 
   @@map("users")
 }
 
@@ -41,7 +42,8 @@ model Task {
 
   workArea    WorkArea @relation(fields: [workAreaId], references: [id])
   createdAt   DateTime @default(now())
-
+  
+  @@unique([title, workAreaId])
   @@map("tasks")
 }
 
@@ -51,7 +53,7 @@ model WorkArea {
   users     User[]
   tasks     Task[]
   materials Material[]
-
+  signatureProcesses SignatureProcess[]
   @@map("work_areas")
 }
 
@@ -69,4 +71,29 @@ model Material {
   updatedAt  DateTime @updatedAt
 
   @@map("materials")
+}
+
+model SignatureProcess {
+  id                String    @id @default(uuid())
+  
+  // Relacionamento com quem finalizou (o colaborador)
+  employeeId        String
+  employee          User      @relation("EmployeeSignatures", fields: [employeeId], references: [id])
+  
+  // Relacionamento com a área onde o processo ocorreu
+  workAreaId        String
+  workArea          WorkArea  @relation(fields: [workAreaId], references: [id])
+  
+  // Dados da assinatura
+  employeeSignature String
+  managerSignature  String?   // Fica nulo até o gestor assinar
+  
+  // Controle de status e datas
+  status            String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  pdfUrl            String?   @db.Text
+  
+  completedAt       DateTime  @default(now())
+  approvedAt        DateTime?
+  
+  @@map("signature_processes")
 }
