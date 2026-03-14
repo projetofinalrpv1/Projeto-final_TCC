@@ -1,3 +1,4 @@
+//src/routes/AppRoutes.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import {Login} from "../pages/Login/Login";
@@ -28,12 +29,12 @@ export function AppRoutes() {
       <Route path="configuracoes" element={<Configuracoes />} />
 
       {/* Aba de Gestor: Acessível por Admin e Gestor */}
-      <Route element={<ProtectedRoute allowedRoles={['admin', 'gestor']} />}>
+      <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'GESTOR']} />}>
         <Route path="gestor" element={<Gestor />} />
       </Route>
 
       {/* PAINEL EXCLUSIVO: Apenas o Admin entra aqui */}
-      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
         <Route path="usuarios" element={<Usuarios />} />
       </Route>
       

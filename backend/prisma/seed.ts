@@ -41,6 +41,39 @@ await prisma.user.upsert({
   },
 });
 
+console.log('⏳ Criando usuários de teste (TI)...')
+  
+  const TI_AREA_ID = "7684be2b-074c-45cf-9d07-99d9d0b41202";
+  const commonPassword = await bcrypt.hash('Senha123!', 8);
+
+  // 1. Criar o Gestor de TI
+  await prisma.user.upsert({
+    where: { email: 'gestor.ti@empresa.com' },
+    update: {},
+    create: {
+      email: 'gestor.ti@empresa.com',
+      name: 'Jorge Gestor (TI)',
+      password: commonPassword,
+      role: 'GESTOR', // Nível de acesso GESTOR
+      workArea: { connect: { id: TI_AREA_ID } }
+    },
+  });
+
+  // 2. Criar o Colaborador de TI
+  await prisma.user.upsert({
+    where: { email: 'colaborador.ti@empresa.com' },
+    update: {},
+    create: {
+      email: 'colaborador.ti@empresa.com',
+      name: 'Carlos Colaborador (TI)',
+      password: commonPassword,
+      role: 'COLABORADOR', // Nível de acesso comum
+      workArea: { connect: { id: TI_AREA_ID } }
+    },
+  });
+
+  console.log('✅ Usuários de teste criados!');
+
   // 2. Lista de Materiais Iniciais (agora com nomes em inglês)
   const materiaisIniciais = [
     {
@@ -108,7 +141,8 @@ await prisma.user.upsert({
       isTemplate: true,
       priority: "HIGH",
       workAreaId: "7684be2b-074c-45cf-9d07-99d9d0b41202", // TI
-      userId: null
+      userId: null,
+      status: "PENDING"
     },
     {
       title: "Verificação de Ponto Eletrônico",
@@ -116,7 +150,8 @@ await prisma.user.upsert({
       isTemplate: true,
       priority: "MEDIUM",
       workAreaId: "0c57b173-47ed-45aa-8fce-706e563765d4", // RH
-      userId: null
+      userId: null,
+      status: "PENDING"
     },
     {
       title: "Fechamento de Caixa Diário",
@@ -124,7 +159,8 @@ await prisma.user.upsert({
       isTemplate: true,
       priority: "HIGH",
       workAreaId: "452f02b9-69af-4dc8-af20-0ed5b20fb382", // Financeiro
-      userId: null
+      userId: null,
+      status: "PENDING"
     },
     {
       title: "Inspeção de Limpeza - Áreas Comuns",
@@ -132,15 +168,17 @@ await prisma.user.upsert({
       isTemplate: true,
       priority: "LOW",
       workAreaId: "dac8fd20-c9f3-43b6-9210-7a03a3f6142f", // Serviços Gerais
-      userId: null
+      userId: null,
+      status: "PENDING"
     },
     {
       title: "Leitura do Mural de Avisos",
       description: "Verificar novos comunicados da diretoria no canal geral.",
       isTemplate: true,
       priority: "MEDIUM",
-      workAreaId: GERAL_AREA_ID, // Geral
-      userId: null
+      workAreaId:"28a9b1c7-d4e5-4a2b-8c7d-9f0a1b2c3d4e", // Geral
+      userId: null,
+      status: "PENDING"
     }
   ];
 

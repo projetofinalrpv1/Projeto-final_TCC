@@ -1,3 +1,4 @@
+// src/controllers/AuthController.ts
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthService } from '../services/AuthService';
 import { loginSchema } from '../schemas/AuthSchemas';
@@ -5,30 +6,23 @@ import { loginSchema } from '../schemas/AuthSchemas';
 const authService = new AuthService();
 
 export async function login(request: FastifyRequest, reply: FastifyReply) {
-  // 1. Validação automática do corpo da requisição via Zod
   const { email, password } = loginSchema.parse(request.body);
 
-  // 2. Chama o serviço para validar as credenciais no banco
   const user = await authService.authenticate({ email, password });
 
-  // 3. Geração do Token JWT
-  // O 'sub' (subject) é sempre o ID do usuário.
-  // Colocamos 'role' e 'workAreaId' no payload para o RBAC funcionar.
   const token = await reply.jwtSign(
-    { 
-      role: user.role, 
-      workAreaId: user.workAreaId 
-    }, 
-    { 
-      sign: { 
+    {
+      role: user.role,
+      workAreaId: user.workAreaId,
+    },
+    {
+      sign: {
         sub: user.id,
-        expiresIn: '7d' // Opcional: define expiração (ex: 7 dias)
-      } 
+        expiresIn: '7d',
+      },
     }
   );
 
-  // 4. Retorno para o Frontend (React)
-  // Enviamos o token e os dados básicos do usuário para o Contexto de Auth do React
   return reply.status(200).send({
     token,
     user: {
@@ -36,8 +30,18 @@ export async function login(request: FastifyRequest, reply: FastifyReply) {
       name: user.name,
       email: user.email,
       role: user.role,
-      workAreaId: user.workAreaId
-    }
+      workAreaId: user.workAreaId,
+    },
   });
 }
 
+// Novo handler — mesmo padrão de função exportada
+export async function me(request: FastifyRequest, reply: FastifyReply) {
+  // Após o preHandler authenticate, request.user tem o payload do token
+  // O 'sub' é o id do usuário — definido no sign.sub do login acima
+  const payload = request.user as { sub: string; role: string; workAreaId: string };
+
+  const user = await authService.getMe(payload.sub);
+
+  return reply.status(200).send(user);
+}

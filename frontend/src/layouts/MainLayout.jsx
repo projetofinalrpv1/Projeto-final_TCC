@@ -15,25 +15,25 @@ export default function MainLayout() {
       name: "Início",
       icon: <FaHome />,
       route: "/app",
-      roles: ["colaborador", "gestor", "admin"]
+      roles: ["COLABORADOR", "GESTOR", "ADMIN"]
     },
     {
       name: "Tarefas",
       icon: <FaTasks />,
       route: "/app/tarefas",
-      roles: ["colaborador", "gestor", "admin"]
+      roles: ["COLABORADOR", "GESTOR", "ADMIN"]
     },
     {
       name: "Gestor",
       icon: <FaUsers />,
       route: "/app/gestor",
-      roles: ["gestor", "admin"]
+      roles: ["GESTOR", "ADMIN"]
     },
     {
       name: "Usuários",
       icon: <FaUserShield />,
       route: "/app/usuarios",
-      roles: ["admin"]
+      roles: ["ADMIN"]
     }
   ];
 

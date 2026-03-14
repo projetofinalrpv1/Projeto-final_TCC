@@ -1,3 +1,5 @@
+//src/routes/ProtectedRoutes.jsx
+
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
 
@@ -5,7 +7,11 @@ export function ProtectedRoute({ allowedRoles }) {
   const { user, signed, loading } = useAuth();
 
   // 1. Enquanto checa o localStorage, não mostra nada
-  if (loading) return null; 
+ if (loading) return (
+  <div style={{ display: 'grid', placeItems: 'center', height: '100vh' }}>
+    <p>Carregando...</p> {/* ou um spinner */}
+  </div>
+); 
 
   // 2. Se não estiver logado, manda pro login
   if (!signed) return <Navigate to="/" replace />;

@@ -68,8 +68,77 @@ export class TaskRepository {
   return await prisma.task.findMany({
     where: { workAreaId }
   });
-
-  
 }
 
+
+async checkIfTaskExistsForToday(userId: string, title: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return await prisma.task.findFirst({
+    where: {
+      userId,
+      title,
+      createdAt: {
+        gte: today // 'gte' significa "maior ou igual a hoje 00:00"
+      }
+    }
+  });
+}
+
+async findByUser(userId: string) {
+  return await prisma.task.findMany({
+    where: {
+      userId: userId,
+      isTemplate: false // Queremos apenas as tarefas de execução, não os moldes
+    },
+    orderBy: {
+      createdAt: 'desc' // As mais novas aparecem no topo
+    }
+  });
+}
+
+async findTaskByTitleAndDate(userId: string, title: string, date: Date) {
+  return await prisma.task.findFirst({
+    where: {
+      userId,
+      title,
+      createdAt: {
+        gte: date // Maior ou igual ao início do dia
+      }
+    }
+  });
+}
+
+async countByStatus(workAreaId: string) {
+  const stats = await prisma.task.groupBy({
+    by: ['status'],
+    where: { workAreaId, isTemplate: false },
+    _count: true
+  });
+  return stats;
+}
+
+async findByArea(workAreaId: string) {
+  return await prisma.task.findMany({
+    where: {
+      workAreaId,
+      isTemplate: false // Não lista os moldes, apenas execuções
+    },
+    include: {
+      user: { select: { name: true } } // Inclui o nome do colaborador responsável
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+}
+
+async findByUserAndDate(userId: string, date: Date) {
+  return await prisma.task.findMany({
+    where: {
+      userId,
+      isTemplate: false,
+      createdAt: { gte: date }
+    }
+  });
+}
 }

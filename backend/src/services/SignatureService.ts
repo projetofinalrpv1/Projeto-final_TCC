@@ -10,27 +10,36 @@ export class SignatureService {
    * Finaliza o checklist e abre o processo de assinatura
    */
   async requestSignature(workAreaId: string, employeeId: string, signature: string) {
-    // 1. Evita duplicidade: verifica se já existe uma assinatura pendente para o colaborador na mesma área
-    const existingProcess = await this.signatureRepository.findPendingProcess(employeeId, workAreaId);
-    if (existingProcess) {
-      throw new AppError("Já existe um processo de finalização pendente.", 400);
-    }
-
-    // 2. Validação de Regra: todas as tarefas devem estar como 'COMPLETED'
-    const tasks = await this.taskRepository.findByWorkArea(workAreaId);
-    
-    if (!tasks || tasks.length === 0) {
-      throw new AppError("Não há tarefas cadastradas para validar.", 400);
-    }
-
-    const allDone = tasks.every(t => t.status === 'COMPLETED');
-    if (!allDone) {
-      throw new AppError("Ainda há tarefas pendentes. Finalize tudo antes de assinar.", 400);
-    }
-
-    // 3. Persiste o processo de assinatura
-    return await this.signatureRepository.saveFinalSignature(workAreaId, employeeId, signature);
+  // 1. Evita duplicidade
+  const existingProcess = await this.signatureRepository.findPendingProcess(employeeId, workAreaId);
+  if (existingProcess) {
+    throw new AppError("Já existe um processo de finalização pendente.", 400);
   }
+
+  // 2. Validação de Regra: Apenas as tarefas DESTE colaborador hoje
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  // Buscamos as tarefas que pertencem ao employeeId criadas hoje
+  const userTasks = await this.taskRepository.findByUserAndDate(employeeId, startOfToday);
+  
+  if (!userTasks || userTasks.length === 0) {
+    throw new AppError("Você não possui tarefas geradas para hoje. Nada para assinar.", 400);
+  }
+
+  // Verifica se existe alguma que NÃO esteja COMPLETED
+  const pendingTasks = userTasks.filter(t => t.status !== 'COMPLETED');
+  
+  if (pendingTasks.length > 0) {
+    throw new AppError(
+      `Você ainda tem ${pendingTasks.length} tarefa(s) pendente(s). Finalize tudo antes de assinar.`, 
+      400
+    );
+  }
+
+  // 3. Persiste o processo de assinatura
+  return await this.signatureRepository.saveFinalSignature(workAreaId, employeeId, signature);
+}
 
   /**
    * Lista assinaturas pendentes para um gestor específico

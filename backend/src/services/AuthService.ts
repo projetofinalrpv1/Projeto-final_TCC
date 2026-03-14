@@ -1,25 +1,27 @@
-import bcrypt from 'bcrypt'
-import { userRepository } from '../repositories/UserRepository'; 
+// src/services/AuthService.ts
+import bcrypt from 'bcrypt';
+import { userRepository } from '../repositories/UserRepository';
 import { AppError } from '../errors/AppError';
-import { LoginInput } from '../schemas/AuthSchemas';
 import { AuthDTO } from '../schemas/AuthSchemas';
 
 export class AuthService {
- async authenticate({ email, password }: AuthDTO) {
-  const user = await userRepository.findByEmail(email);
-  if (!user) throw new AppError("Credenciais inválidas", 401);
+  async authenticate({ email, password }: AuthDTO) {
+    const user = await userRepository.findByEmail(email);
+    if (!user) throw new AppError("Credenciais inválidas", 401);
 
-  // LOG DE DEBUG (Remova depois)
-  console.log("Tentando logar com:", email);
-  console.log("Senha fornecida:", password);
-  console.log("Hash no banco:", user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) throw new AppError("Credenciais inválidas", 401);
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  
-  console.log("Resultado do compare:", passwordMatch); // Se aqui for false, o hash não bate
+    return user;
+  }
 
-  if (!passwordMatch) throw new AppError("Credenciais inválidas", 401);
+  // Retorna os dados do usuário autenticado a partir do id extraído do token (sub)
+  async getMe(userId: string) {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new AppError("Usuário não encontrado.", 404);
 
-  return user;
- }
+    // Reutiliza o mesmo sanitize pattern do UserService — sem expor a senha
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
 }

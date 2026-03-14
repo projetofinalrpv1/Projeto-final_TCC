@@ -1,22 +1,17 @@
 // src/components/Sidebar/Sidebar.jsx
-import { NavLink, Link, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FaCog } from "react-icons/fa";
 import { useAuth } from "../../contexts/useAuth";
 import "./Sidebar.css";
 
 export function Sidebar({ items, isFechado }) {
-  const location = useLocation();
   const { user } = useAuth();
 
-  // Lógica de filtro aprimorada
   const filteredItems = items.filter(item => {
-    // Se o usuário for admin, ele tem acesso total a todos os itens da lista
-    if (user?.role === 'admin') return true;
-    
-    // Se o item não tiver restrição de roles, qualquer um vê
+    // Sem restrição de roles — qualquer um vê
     if (!item.roles) return true;
-    
-    // Caso contrário, verifica se o cargo do usuário está permitido
+
+    // Compara com o role exato vindo do banco (ex: 'ADMIN', 'GESTOR', 'COLABORADOR')
     return item.roles.includes(user?.role);
   });
 
@@ -40,9 +35,8 @@ export function Sidebar({ items, isFechado }) {
             </NavLink>
           ))}
 
-
-          <NavLink 
-            to="/app/configuracoes" 
+          <NavLink
+            to="/app/configuracoes"
             className="sidebar-link-wrapper"
           >
             {({ isActive }) => (

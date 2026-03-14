@@ -1,7 +1,8 @@
 import { FastifyInstance } from 'fastify';
-import { createTask, listTasks, updateTaskStatus, deleteTask } from '../controllers/TaskController';
+import { createTask, listTasks, listMyTasks, listTasksFromArea,
+        listTemplates, updateTaskStatus, deleteTask } from '../controllers/TaskController';
 import { verifyRole } from '../hooks/checkPermissions';
-import { finalizeChecklist } from '../controllers/TaskController';
+
 export async function taskRoutes(app: FastifyInstance) {
   // 1. Global Protection: All routes below require authentication
   app.addHook('onRequest', app.authenticate);
@@ -36,6 +37,28 @@ export async function taskRoutes(app: FastifyInstance) {
     }
   }, listTasks);
 
+  app.get('/tasks/my', {
+  schema: {
+    tags: ['Tasks'],
+    summary: 'List daily tasks for the logged user (syncs templates)'
+  }
+}, listMyTasks)
+
+app.get('/tasks/area', {
+  onRequest: [(request, reply) => verifyRole(request, reply, ['GESTOR', 'ADMIN'])],
+  schema: {
+    tags: ['Tasks'],
+    summary: 'List all tasks from the managers work area'
+  }
+}, listTasksFromArea);
+
+app.get('/tasks/templates', {
+  onRequest: [(request, reply) => verifyRole(request, reply, ['GESTOR', 'ADMIN'])],
+  schema: {
+    tags: ['Tasks'],
+    summary: 'List only template tasks for management'
+  }
+}, listTemplates)
   // 4. Update Status (Available for all authenticated users)
   app.patch('/tasks/:id/status', {
     schema: {
@@ -59,7 +82,7 @@ export async function taskRoutes(app: FastifyInstance) {
 
   // 5. Delete Task (Restricted: GESTOR or ADMIN)
   app.delete('/tasks/:id', {
-    onRequest: [(request, reply) => verifyRole(request, reply, ['GESTOR', 'ADMIN'])],
+   onRequest: [app.authenticate, (request, reply) => verifyRole(request, reply, ['GESTOR', 'ADMIN'])],
     schema: {
       summary: 'Delete a specific task',
       tags: ['Tasks'],

@@ -17,7 +17,7 @@ import { signatureRoutes } from './routes/SignatureRoutes';
 
 const app: FastifyInstance = fastify({ logger: true });
 
-// 1. Error Handler Global
+// 1. Error Handler Global (Mantenha igual)
 app.setErrorHandler((error, request, reply) => {
   if (error instanceof z.ZodError) {
     return reply.status(400).send({ message: "Erro de validação", errors: error.format() });
@@ -29,23 +29,24 @@ app.setErrorHandler((error, request, reply) => {
   return reply.status(500).send({ message: "Erro interno no servidor." });
 });
 
-// app.addHook('onRequest', async (request, reply) => {
-//   console.log('--- HEADERS RECEBIDOS PELO SERVIDOR ---');
-//   console.log(request.headers); 
-// });
+// 2. Verificação do Secret (Crucial)
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  throw new Error("ERRO CRÍTICO: JWT_SECRET não definida no arquivo .env");
+}
 
-// 2. Plugins de Infraestrutura
+// 3. Plugins de Infraestrutura
 app.register(cors, { origin: '*' });
 
-// 3. Registro do JWT (Crucial: deve vir ANTES das rotas)
+// 4. Registro do JWT (USANDO A CONSTANTE VALIDADA)
 app.register(fastifyJwt, {
-  secret: process.env.JWT_SECRET || 'supersecret_change_me' // Lembre-se de mudar isso!
+  secret: jwtSecret // Aqui o TS não reclama, pois garantimos acima que é string
 });
 
-// 4. Seus Decorators Customizados (ex: authenticate, verifyRole)
+// 5. Seus Decorators Customizados (authenticate, verifyRole)
 app.register(auth); 
 
-// 5. Documentação
+// 6. Documentação Swagger (Mantenha igual)
 app.register(swagger, {
   openapi: {
     info: {
@@ -67,13 +68,14 @@ app.register(swagger, {
 });
 app.register(swaggerUi, { routePrefix: '/docs' });
 
-// 6. Registro de Rotas
+// 7. Registro de Rotas (Organizado)
 app.register(authRoutes, { prefix: '/auth' });
 app.register(userRoutes, { prefix: '/api' });
 app.register(workAreaRoutes, { prefix: '/api' });
 app.register(taskRoutes, { prefix: '/api' });
 app.register(materialRoutes, { prefix: '/api' });
-app.register(signatureRoutes, {prefix: '/api'}) 
+app.register(signatureRoutes, { prefix: '/api' });
+
 app.get('/healthcheck', async () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });

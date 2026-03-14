@@ -35,6 +35,28 @@ export const listTasks = async (request: FastifyRequest, reply: FastifyReply) =>
   return reply.status(200).send(tasks);
 };
 
+export const listMyTasks = async (request: FastifyRequest, reply: FastifyReply) => {
+  const { sub: userId, workAreaId } = request.user as any;
+
+  const tasks = await taskService.executeListMyTasks(userId, workAreaId, request.user);
+
+  return reply.status(200).send(tasks);
+}
+
+export const listTasksFromArea = async (request: FastifyRequest, reply: FastifyReply) => {
+  const tasks = await taskService.executeListTasksFromArea(request.user);
+  return reply.send(tasks);
+};
+
+export const listTemplates = async (request: FastifyRequest, reply: FastifyReply) => {
+  const templates = await taskService.executeListTemplates(request.user.workAreaId);
+  return reply.send(templates);
+};
+
+export const getTaskSummary = async (request: FastifyRequest, reply: FastifyReply) => {
+  const summary = await taskService.executeGetTaskSummary(request.user.workAreaId);
+  return reply.send(summary);
+};
 /**
  * Atualiza o status e/ou prioridade de uma tarefa existente.
  * O Service validará se o usuário tem permissão (Admin ou Dono).

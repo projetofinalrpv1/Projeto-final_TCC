@@ -1,7 +1,9 @@
+// src/routes/AuthRoutes.ts
 import { FastifyInstance } from 'fastify';
-import { login } from '../controllers/AuthController';
+import { login, me } from '../controllers/AuthController';
 
 export async function authRoutes(app: FastifyInstance) {
+  // POST /auth/login — pública
   app.post('/login', {
     schema: {
       tags: ['Auth'],
@@ -11,15 +13,57 @@ export async function authRoutes(app: FastifyInstance) {
         required: ['email', 'password'],
         properties: {
           email: { type: 'string', format: 'email' },
-          password: { type: 'string' }
-        }
+          password: { type: 'string', minLength: 6 },
+        },
       },
       response: {
         200: {
           type: 'object',
-          properties: { token: { type: 'string' } }
-        }
-      }
-    }
+          properties: {
+            token: { type: 'string' },
+            user: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                email: { type: 'string' },
+                role: { type: 'string' },
+                workAreaId: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+    },
   }, login);
+
+  // GET /auth/me — protegida
+  app.get('/me', {
+    preHandler: [app.authenticate],
+    schema: {
+      tags: ['Auth'],
+      summary: 'Retorna os dados do usuário autenticado',
+      security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            email: { type: 'string' },
+            role: { type: 'string' },
+            workAreaId: { type: 'string' },
+            isActive: { type: 'boolean' },
+            createdAt: { type: 'string' },
+          },
+        },
+        401: {
+          type: 'object',
+          properties: {
+            message: { type: 'string' },
+          },
+        },
+      },
+    },
+  }, me);
 }

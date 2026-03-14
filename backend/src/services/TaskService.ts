@@ -96,4 +96,78 @@ export class TaskService {
   // 3. Se cair aqui (ex: COLABORADOR), bloqueia
   throw new AppError("Você não tem permissão para deletar tarefas.", 403);
 }
+
+
+
+async executeListByUser(userId: string, requester: any) {
+  // REGRA DE OURO PARA O TCC:
+  // Um usuário comum só pode ver suas próprias tarefas.
+  // ADMIN ou o GESTOR da área podem ver as tarefas de outros.
+  
+  const isOwner = requester.sub === userId;
+  const isAdmin = requester.role === 'ADMIN';
+  const isManager = requester.role === 'GESTOR';
+
+  if (!isOwner && !isAdmin && !isManager) {
+    throw new AppError("Você não tem permissão para visualizar as tarefas deste usuário.", 403);
+  }
+
+  // Se for Gestor, você poderia adicionar uma trava extra aqui para 
+  // garantir que ele só veja usuários da mesma workAreaId.
+
+  return await this.taskRepository.findByUser(userId);
+}
+
+async executeListMyTasks(userId: string, workAreaId: string, requester: any) {
+  // 1. Lógica de Automação (Sync)
+  const templates = await this.taskRepository.findTemplatesByArea(workAreaId);
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  for (const template of templates) {
+    const alreadyExists = await this.taskRepository.findTaskByTitleAndDate(
+      userId, 
+      template.title, 
+      startOfToday
+    );
+
+    if (!alreadyExists) {
+      await this.taskRepository.create({
+        title: template.title,
+        description: template.description,
+        priority: template.priority,
+        status: 'PENDING',
+        workAreaId: template.workAreaId,
+        userId: userId,
+        isTemplate: false
+      });
+    }
+  }
+
+  // 2. Retorna a lista atualizada
+  return await this.taskRepository.findByUser(userId);
+}
+
+async executeListTasksFromArea(requester: any) {
+  if (requester.role !== 'GESTOR' && requester.role !== 'ADMIN') {
+    throw new AppError("Acesso restrito a gestores.", 403);
+  }
+  return await this.taskRepository.findByArea(requester.workAreaId);
+}
+
+// Listagem de templates (para o gestor editar os moldes)
+async executeListTemplates(workAreaId: string) {
+  return await this.taskRepository.findTemplatesByArea(workAreaId);
+}
+
+// Resumo para o Dashboard
+async executeGetTaskSummary(workAreaId: string) {
+  const stats = await this.taskRepository.countByStatus(workAreaId);
+  
+  // Formata o retorno para algo amigável: { PENDING: 5, COMPLETED: 10 }
+  return stats.reduce((acc: any, curr) => {
+    acc[curr.status] = curr._count;
+    return acc;
+  }, { PENDING: 0, IN_PROGRESS: 0, COMPLETED: 0 });
+}
 }

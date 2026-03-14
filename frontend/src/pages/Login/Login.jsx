@@ -1,61 +1,74 @@
+// src/pages/Login/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/useAuth";
+import api from "../../service/api";
 import "./Login.css";
 
 export function Login() {
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
+  // --- Estados do formulário de login ---
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loadingLogin, setLoadingLogin] = useState(false);
+
+  // --- Estados do formulário de reset ---
   const [resetMode, setResetMode] = useState(false);
-  const [identificadorReset, setIdentificadorReset] = useState("");
-  const [novaSenha, setNovaSenha] = useState("");
+  const [emailReset, setEmailReset] = useState("");
+  const [resetMsg, setResetMsg] = useState("");
+  const [loadingReset, setLoadingReset] = useState(false);
 
-const usuarios = {
-  "admin@email.com": { senha: "123", role: "admin", name: "Administrador Geral" },
-  "gestor1@email.com": { senha: "789", role: "gestor", name: "Gestor Principal" },
-  "usuario1@email.com": { senha: "456", role: "colaborador", name: "Colaborador" },
-};
-  const handleLogin = (e) => {
+  // -------------------------------------------------------
+  // LOGIN: consome a API real via signIn do AuthContext
+  // -------------------------------------------------------
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const dadosUsuario = usuarios[email];
+    setErrorMsg("");
+    setLoadingLogin(true);
 
-    if (dadosUsuario && dadosUsuario.senha === senha) {
-      login({
-        email: email,
-        name: dadosUsuario.name,
-        role: dadosUsuario.role
-      });
+    const result = await signIn({ email, password: senha });
 
-      // Redirecionamento imediato após setar o contexto
-      if (dadosUsuario.role === "gestor") {
-        navigate("/app/gestor");
-      } else {
-        navigate("/app/tarefas");
-      }
+    if (result.success) {
+      navigate("/app"); // Redireciona pro Dashboard — ele decide o que mostrar por role
     } else {
-      alert("Email ou senha incorretos.");
+      setErrorMsg(result.message);
     }
+
+    setLoadingLogin(false);
   };
 
-  const handleResetPassword = (e) => {
+  // -------------------------------------------------------
+  // RESET DE SENHA: envia e-mail para a rota da API
+  // Ajuste o endpoint conforme sua rota no Fastify
+  // -------------------------------------------------------
+  const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (usuarios.hasOwnProperty(identificadorReset)) {
-      alert(`Instrução enviada para ${identificadorReset}.`);
-      setResetMode(false);
-      setIdentificadorReset("");
-      setNovaSenha("");
-    } else {
-      alert("E-mail não encontrado.");
+    setResetMsg("");
+    setLoadingReset(true);
+
+    try {
+      await api.post("/auth/forgot-password", { email: emailReset });
+      setResetMsg("Instruções enviadas para o seu e-mail.");
+      setEmailReset("");
+    } catch (error) {
+      const msg = error.response?.data?.message || "E-mail não encontrado.";
+      setResetMsg(msg);
     }
+
+    setLoadingReset(false);
   };
 
+  // -------------------------------------------------------
+  // RENDER
+  // -------------------------------------------------------
   return (
     <div className="aba-principal">
-      <img src="./src/assets/Logo-on-the-job1.PNG" alt="" />
+      <img src="./src/assets/Logo-on-the-job1.PNG" alt="Logo On The Job" />
       <h1>ON THE JOB</h1>
+
       <div className="login-container">
         {!resetMode ? (
           <>
@@ -75,11 +88,27 @@ const usuarios = {
                 onChange={(e) => setSenha(e.target.value)}
                 required
               />
-              <button type="submit" className="botao">Entrar</button>
+
+              {/* Exibe mensagem de erro vinda da API */}
+              {errorMsg && <p className="error-msg">{errorMsg}</p>}
+
+              <button type="submit" className="botao" disabled={loadingLogin}>
+                {loadingLogin ? "Entrando..." : "Entrar"}
+              </button>
             </form>
+
             <p className="link-redefinir">
               Esqueceu sua senha?{" "}
-              <a href="#" onClick={(e) => { e.preventDefault(); setResetMode(true); }}>redefinir senha</a>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setErrorMsg("");
+                  setResetMode(true);
+                }}
+              >
+                redefinir senha
+              </a>
             </p>
           </>
         ) : (
@@ -89,21 +118,30 @@ const usuarios = {
               <input
                 type="email"
                 placeholder="E-mail de recuperação"
-                value={identificadorReset}
-                onChange={(e) => setIdentificadorReset(e.target.value)}
+                value={emailReset}
+                onChange={(e) => setEmailReset(e.target.value)}
                 required
               />
-              <input
-                type="password"
-                placeholder="Nova senha"
-                value={novaSenha}
-                onChange={(e) => setNovaSenha(e.target.value)}
-                required
-              />
-              <button type="submit" className="botao">Redefinir</button>
+
+              {/* Exibe mensagem de sucesso ou erro do reset */}
+              {resetMsg && <p className="error-msg">{resetMsg}</p>}
+
+              <button type="submit" className="botao" disabled={loadingReset}>
+                {loadingReset ? "Enviando..." : "Enviar instruções"}
+              </button>
             </form>
+
             <p className="link-redefinir">
-              <a href="#" onClick={(e) => { e.preventDefault(); setResetMode(false); }}>Voltar</a>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setResetMsg("");
+                  setResetMode(false);
+                }}
+              >
+                Voltar
+              </a>
             </p>
           </>
         )}
