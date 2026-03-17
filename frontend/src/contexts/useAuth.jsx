@@ -1,4 +1,5 @@
 // src/contexts/useAuth.jsx
+// APENAS o hook
 import { useContext } from 'react';
 import { AuthContext } from './AuthContext';
 

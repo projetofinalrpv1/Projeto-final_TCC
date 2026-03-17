@@ -1,25 +1,28 @@
+// src/routes/MaterialRoutes.ts
 import { FastifyInstance } from 'fastify';
-import { createMaterial, listMaterialByArea, getMaterialDetails, deleteMaterial} from '../controllers/MaterialController';
+import { createMaterial, listMaterialByArea, getMaterialDetails, deleteMaterial } from '../controllers/MaterialController';
 import { verifyRole, verifyWorkArea } from '../hooks/checkPermissions';
+
 export async function materialRoutes(app: FastifyInstance) {
-  
+
+  // POST /api/materials
   app.post('/materials', {
     onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
     schema: {
       tags: ['Materiais'],
       summary: 'Adicionar novo material de apoio',
       body: {
-       type: 'object',
-       required: ['titulo', 'gestor', 'workAreaId', 'arquivoUrl', 'descricao'], // Todos são importantes
-       properties: {
-         titulo: { type: 'string' },
-         gestor: { type: 'string' },
-         workAreaId: { type: 'string' },
-         arquivoUrl: { type: 'string' }, // O link do Google Drive que você mencionou
-         descricao: { type: 'string' },  // A breve descrição para a página de detalhes
-         rota: { type: 'string' }       // Mantemos se você for usar para navegação interna
-  }
-},
+        type: 'object',
+        required: ['titulo', 'gestor', 'workAreaId', 'arquivoUrl', 'descricao'],
+        properties: {
+          titulo: { type: 'string' },
+          gestor: { type: 'string' },
+          workAreaId: { type: 'string' },
+          arquivoUrl: { type: 'string' },
+          descricao: { type: 'string' },
+          rota: { type: 'string' }
+        }
+      },
       response: {
         201: {
           type: 'object',
@@ -27,6 +30,8 @@ export async function materialRoutes(app: FastifyInstance) {
             id: { type: 'string' },
             titulo: { type: 'string' },
             gestor: { type: 'string' },
+            descricao: { type: 'string' },
+            arquivoUrl: { type: 'string' },
             rota: { type: 'string' },
             workAreaId: { type: 'string' }
           }
@@ -35,10 +40,11 @@ export async function materialRoutes(app: FastifyInstance) {
     }
   }, createMaterial);
 
+  // GET /api/materials/:workAreaId
   app.get('/materials/:workAreaId', {
-   onRequest: [
+    onRequest: [
       (req, rep) => verifyRole(req, rep, ['ADMIN', 'GESTOR', 'COLABORADOR']),
-      verifyWorkArea // Só permite se o workAreaId da URL bater com o do token
+      verifyWorkArea
     ],
     schema: {
       tags: ['Materiais'],
@@ -58,7 +64,9 @@ export async function materialRoutes(app: FastifyInstance) {
             properties: {
               id: { type: 'string' },
               titulo: { type: 'string' },
-              professor: { type: 'string' },
+              gestor: { type: 'string' },      // ← corrigido de 'professor' para 'gestor'
+              descricao: { type: 'string' },   // ← adicionado
+              arquivoUrl: { type: 'string' },  // ← adicionado
               rota: { type: 'string' },
               workAreaId: { type: 'string' }
             }
@@ -68,51 +76,61 @@ export async function materialRoutes(app: FastifyInstance) {
     }
   }, listMaterialByArea);
 
+  // GET /api/materials/detalhes/:id
   app.get('/materials/detalhes/:id', {
-  onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
-  schema: {
-    tags: ['Materiais'],
-    summary: 'Busca todos os dados de um material específico pelo ID',
-    params: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'ID único do material' }
-      }
-    }
-  }
-}, getMaterialDetails);
-
-app.delete('/materials/:id', {
-  onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
-  schema: {
-    summary: 'Deleta um material permanentemente',
-    description: 'Remove o material do banco de dados usando o ID fornecido.',
-    tags: ['Materiais'],
-    params: {
-      type: 'object',
-      required: ['id'],
-      properties: {
-        id: { 
-          type: 'string', 
-          description: 'ID único do material (UUID)' 
-        }
-      }
-    },
-    response: {
-      204: {
-        description: 'Material deletado com sucesso',
-        type: 'null'
-      },
-      400: {
-        description: 'Erro na requisição ou ID inexistente',
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
+    schema: {
+      tags: ['Materiais'],
+      summary: 'Busca todos os dados de um material específico pelo ID',
+      params: {
         type: 'object',
         properties: {
-          message: { type: 'string' }
+          id: { type: 'string', description: 'ID único do material' }
+        }
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            titulo: { type: 'string' },
+            gestor: { type: 'string' },
+            descricao: { type: 'string' },
+            arquivoUrl: { type: 'string' },
+            rota: { type: 'string' },
+            workAreaId: { type: 'string' }
+          }
         }
       }
     }
-  }
-}, deleteMaterial);
+  }, getMaterialDetails);
+
+  // DELETE /api/materials/:id
+  app.delete('/materials/:id', {
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
+    schema: {
+      summary: 'Deleta um material permanentemente',
+      description: 'Remove o material do banco de dados usando o ID fornecido.',
+      tags: ['Materiais'],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string', description: 'ID único do material (UUID)' }
+        }
+      },
+      response: {
+        204: {
+          description: 'Material deletado com sucesso',
+          type: 'null'
+        },
+        400: {
+          type: 'object',
+          properties: {
+            message: { type: 'string' }
+          }
+        }
+      }
+    }
+  }, deleteMaterial);
 }
-
-

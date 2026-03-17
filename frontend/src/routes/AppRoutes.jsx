@@ -9,7 +9,7 @@ import {Configuracoes} from "../pages/Configuracoes/Configuracoes";
 import { Perfil } from "../pages/Perfil/Perfil";
 import MainLayout from "../layouts/MainLayout";
 import { Usuarios } from "../pages/Usuarios/Usuarios";
-import { AuthProvider } from '../contexts/AuthContext';
+import { AuthProvider } from '../contexts/AuthProvider';
 import { ProtectedRoute } from './ProtectedRoute';
 
 

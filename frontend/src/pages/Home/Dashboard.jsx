@@ -1,288 +1,209 @@
-// src/components/Home/HomeDashboard.jsx
-
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+// src/pages/Home/Dashboard.jsx
+import { useState, useEffect } from "react";
+import { useAuth } from "../../contexts/useAuth";
+import api from "../../service/api";
+import { CourseCard } from "../../components/CourseCard/CourseCard";
 import "./Dashboard.css";
 
-/* ======================================================
-   DADOS MOCKADOS ANTIGOS (REMOVIDOS)
-   AGORA OS MATERIAIS VÊM DO BACKEND
-====================================================== */
-
-// const initialCourses = [
-//   {
-//     id: 1,
-//     title: "Arquitetura de Software",
-//     professor: "Liderança Técnica",
-//     route: "/app/curso/arq",
-//   },
-//   {
-//     id: 2,
-//     title: "Práticas em Desenvolvimento",
-//     professor: "Equipe de Engenharia",
-//     route: "/app/curso/dev",
-//   },
-//   {
-//     id: 3,
-//     title: "Segurança e Governança de TI",
-//     professor: "Time de Infraestrutura",
-//     route: "/app/curso/seguranca",
-//   },
-// ];
-
-const CourseCard = ({ id, title, professor, route }) => (
-  <div className="bloco-curso-wrapper">
-    <Link to={route || "#"} className="bloco-curso-link">
-      <div className="bloco-curso">
-        <div className="bloco-curso-topo" />
-
-        <div className="bloco-curso-conteudo">
-          <h3>{title}</h3>
-          <p className="curso-professor">{professor}</p>
-        </div>
-
-        <div className="curso-rodape">
-          <span className="tag-conteudo">Material Estratégico</span>
-        </div>
-      </div>
-    </Link>
-  </div>
-);
-
 export function Dashboard() {
-
-  /* =============================
-     STATE DOS MATERIAIS
-  ============================== */
-
-  // antes:
-  // const [courses, setCourses] = useState(initialCourses);
+  const { user, loading: authLoading } = useAuth();
 
   const [courses, setCourses] = useState([]);
-
+  const [loadingMateriais, setLoadingMateriais] = useState(true);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [loadingSalvar, setLoadingSalvar] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [novoConteudo, setNovoConteudo] = useState({
     titulo: "",
-    tipo: "pdf",
-    arquivo: null,
+    gestor: "",
+    descricao: "",
+    arquivoUrl: "",
+    rota: "",
   });
 
-  /* =============================
-     BUSCAR MATERIAIS NO BACKEND
-  ============================== */
+  const podeGerenciar = ['ADMIN', 'GESTOR'].includes(user?.role);
 
   useEffect(() => {
+    // Espera o AuthContext terminar de carregar E o token estar disponível
+    const token = localStorage.getItem('@App:token');
+  console.log('authLoading:', authLoading);
+  console.log('user:', user);
+  console.log('token:', token);
+    if (authLoading || !user?.workAreaId || !token) return;
 
-    const fetchMaterials = async () => {
-
+    async function fetchMaterials() {
+      setLoadingMateriais(true);
       try {
-
-        const workAreaId = localStorage.getItem("workAreaId");
-
-        const response = await axios.get(
-          `http://localhost:3333/materials/${workAreaId}`
-        );
-
+        const response = await api.get(`/api/materials/${user.workAreaId}`);
         setCourses(response.data);
-
       } catch (error) {
-
         console.error("Erro ao buscar materiais:", error);
-
+      } finally {
+        setLoadingMateriais(false);
       }
-
-    };
-
-    fetchMaterials();
-
-  }, []);
-
-  /* =============================
-     SALVAR MATERIAL NO BACKEND
-  ============================== */
-
-  const adicionarConteudo = async () => {
-
-    if (!novoConteudo.titulo) return;
-
-    try {
-
-      const workAreaId = localStorage.getItem("workAreaId");
-      const token = localStorage.getItem("token");
-
-      const response = await axios.post(
-        "http://localhost:3333/materials",
-        {
-          titulo: novoConteudo.titulo,
-          gestor: "Gestor da Área",
-          descricao: "Material enviado pela plataforma",
-          arquivoUrl: "https://drive.google.com",
-          workAreaId: workAreaId,
-          rota: "#"
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      setCourses([...courses, response.data]);
-
-      setMostrarModal(false);
-
-      setNovoConteudo({
-        titulo: "",
-        tipo: "pdf",
-        arquivo: null,
-      });
-
-    } catch (error) {
-
-      console.error("Erro ao salvar material:", error);
-
     }
 
-  };
+    fetchMaterials();
+  }, [user, authLoading]); // depende do authLoading também
+
+  async function adicionarConteudo() {
+    const { titulo, gestor, descricao, arquivoUrl } = novoConteudo;
+
+    if (!titulo || !gestor || !descricao || !arquivoUrl) {
+      setErrorMsg("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    setLoadingSalvar(true);
+    setErrorMsg("");
+
+    try {
+      const response = await api.post("/api/materials", {
+        titulo,
+        gestor,
+        descricao,
+        arquivoUrl,
+        rota: novoConteudo.rota || "#",
+        workAreaId: user.workAreaId,
+      });
+
+      setCourses(prev => [...prev, response.data]);
+      setMostrarModal(false);
+      setNovoConteudo({ titulo: "", gestor: "", descricao: "", arquivoUrl: "", rota: "" });
+    } catch (error) {
+      setErrorMsg(error.response?.data?.message || "Erro ao salvar material.");
+    } finally {
+      setLoadingSalvar(false);
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!confirm("Deseja excluir este material permanentemente?")) return;
+    try {
+      await api.delete(`/api/materials/${id}`);
+      setCourses(prev => prev.filter(c => c.id !== id));
+    } catch (error) {
+      alert(error.response?.data?.message || "Erro ao excluir material.");
+    }
+  }
+
+  // Enquanto o auth ainda está carregando, não renderiza nada
+  if (authLoading) return null;
 
   return (
-
     <div className="conteudo-pagina">
-
       <h2 className="titulo-secao">Adaptação</h2>
 
       <div className="bloco-atividades">
-
         <div className="atividade-item">
           <p className="atividade-titulo">
             Programa de integração - Engenharia de Software
           </p>
         </div>
-
         <div className="atividade-item">
-          <p className="atividade-titulo">
-            Demandas técnicas atribuídas
-          </p>
+          <p className="atividade-titulo">Demandas técnicas atribuídas</p>
         </div>
-
       </div>
 
       <div className="topo-conteudos">
-
-        <h2 className="titulo-secao">
-          Conteúdos recomendados
-        </h2>
-
-        <button
-          className="botao-primario"
-          onClick={() => setMostrarModal(true)}
-        >
-          + Adicionar conteúdo
-        </button>
-
+        <h2 className="titulo-secao">Conteúdos recomendados</h2>
+        {podeGerenciar && (
+          <button className="botao-primario" onClick={() => setMostrarModal(true)}>
+            + Adicionar conteúdo
+          </button>
+        )}
       </div>
 
       <p className="cursos-subtitulo">
         Materiais estratégicos voltados para desenvolvimento e tecnologia
       </p>
 
-      <div className="blocos-cursos">
-
-        {courses.map((course) => (
-
-          <CourseCard
-            key={course.id}
-            id={course.id}
-            title={course.title}
-            professor={course.manager}
-            route={course.route}
-          />
-
-        ))}
-
-      </div>
+      {loadingMateriais ? (
+        <p style={{ opacity: 0.6 }}>Carregando materiais...</p>
+      ) : courses.length === 0 ? (
+        <p style={{ opacity: 0.6 }}>Nenhum material disponível para sua área.</p>
+      ) : (
+        <div className="blocos-cursos">
+          {courses.map(course => (
+            <CourseCard
+              key={course.id}
+              id={course.id}
+              titulo={course.titulo}
+              gestor={course.gestor}
+              rota={course.rota}
+              canDelete={podeGerenciar}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
 
       {mostrarModal && (
-
         <div className="modal-overlay">
-
           <div className="modal-container">
-
-            <h3 className="modal-titulo">
-              Novo Conteúdo Técnico
-            </h3>
+            <h3 className="modal-titulo">Novo Material de Apoio</h3>
 
             <input
               type="text"
-              placeholder="Título do material"
+              placeholder="Título do material *"
               value={novoConteudo.titulo}
-              onChange={(e) =>
-                setNovoConteudo({
-                  ...novoConteudo,
-                  titulo: e.target.value,
-                })
-              }
+              onChange={e => setNovoConteudo(prev => ({ ...prev, titulo: e.target.value }))}
               className="modal-input"
             />
-
-            <select
-              value={novoConteudo.tipo}
-              onChange={(e) =>
-                setNovoConteudo({
-                  ...novoConteudo,
-                  tipo: e.target.value,
-                })
-              }
-              className="modal-input"
-            >
-              <option value="pdf">PDF</option>
-              <option value="video">Vídeo</option>
-            </select>
-
             <input
-              type="file"
-              accept={
-                novoConteudo.tipo === "pdf"
-                  ? ".pdf"
-                  : "video/*"
-              }
-              onChange={(e) =>
-                setNovoConteudo({
-                  ...novoConteudo,
-                  arquivo: e.target.files[0],
-                })
-              }
-              className="modal-file"
+              type="text"
+              placeholder="Nome do Gestor responsável *"
+              value={novoConteudo.gestor}
+              onChange={e => setNovoConteudo(prev => ({ ...prev, gestor: e.target.value }))}
+              className="modal-input"
             />
+            <input
+              type="text"
+              placeholder="Descrição breve *"
+              value={novoConteudo.descricao}
+              onChange={e => setNovoConteudo(prev => ({ ...prev, descricao: e.target.value }))}
+              className="modal-input"
+            />
+            <input
+              type="url"
+              placeholder="Link do arquivo (Google Drive, etc.) *"
+              value={novoConteudo.arquivoUrl}
+              onChange={e => setNovoConteudo(prev => ({ ...prev, arquivoUrl: e.target.value }))}
+              className="modal-input"
+            />
+            <input
+              type="text"
+              placeholder="Rota interna (opcional, ex: /app/curso/arq)"
+              value={novoConteudo.rota}
+              onChange={e => setNovoConteudo(prev => ({ ...prev, rota: e.target.value }))}
+              className="modal-input"
+            />
+
+            {errorMsg && (
+              <p style={{ color: '#e74c3c', fontSize: '0.85rem', margin: '4px 0' }}>
+                {errorMsg}
+              </p>
+            )}
 
             <div className="modal-botoes">
-
               <button
                 className="botao-secundario"
-                onClick={() => setMostrarModal(false)}
+                onClick={() => { setMostrarModal(false); setErrorMsg(""); }}
               >
                 Cancelar
               </button>
-
               <button
                 className="botao-primario"
                 onClick={adicionarConteudo}
+                disabled={loadingSalvar}
               >
-                Salvar
+                {loadingSalvar ? "Salvando..." : "Salvar"}
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       )}
-
     </div>
-
   );
-
 }
