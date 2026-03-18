@@ -1,13 +1,24 @@
+// src/routes/UserRoutes.ts
 import { FastifyInstance } from 'fastify';
-import { createUser, listUsers, listManagers, replaceUser, deactivateUser, patchUser } from '../controllers/UserController';
+import {
+  createUser,
+  listUsers,
+  listManagers,
+  getTeam,
+  replaceUser,
+  deactivateUser,
+  patchUser
+} from '../controllers/UserController';
 import { verifyRole } from '../hooks/checkPermissions';
+
 export async function userRoutes(app: FastifyInstance) {
 
+  // POST /api/users
   app.post('/users', {
-  onRequest: [
-    app.authenticate, // 1. Primeiro verifica se o token é válido
-    (request, reply) => verifyRole(request, reply, ['ADMIN']) // 2. Depois checa a role
-  ],
+    onRequest: [
+      app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['ADMIN'])
+    ],
     schema: {
       tags: ['Users'],
       summary: 'Register a new collaborator or manager',
@@ -25,10 +36,9 @@ export async function userRoutes(app: FastifyInstance) {
       },
       response: {
         201: {
-          description: 'User created successfully',
           type: 'object',
           properties: {
-            id: { type: 'string', format: 'uuid' },
+            id: { type: 'string' },
             name: { type: 'string' },
             email: { type: 'string' },
             role: { type: 'string' },
@@ -39,11 +49,12 @@ export async function userRoutes(app: FastifyInstance) {
     }
   }, createUser);
 
+  // GET /api/users
   app.get('/users', {
-   onRequest: [
-    app.authenticate, // 1. Primeiro verifica se o token é válido
-    (request, reply) => verifyRole(request, reply, ['ADMIN']) // 2. Depois checa a role
-  ],
+    onRequest: [
+      app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['ADMIN'])
+    ],
     schema: {
       tags: ['Users'],
       summary: 'List all users',
@@ -53,14 +64,15 @@ export async function userRoutes(app: FastifyInstance) {
           items: {
             type: 'object',
             properties: {
-              id: { type: 'string', format: 'uuid' },
+              id: { type: 'string' },
               name: { type: 'string' },
               email: { type: 'string' },
               role: { type: 'string' },
+              isActive: { type: 'boolean' },
               workArea: {
                 type: 'object',
                 properties: {
-                  id: { type: 'string', format: 'uuid' },
+                  id: { type: 'string' },
                   name: { type: 'string' }
                 }
               }
@@ -71,11 +83,12 @@ export async function userRoutes(app: FastifyInstance) {
     }
   }, listUsers);
 
+  // GET /api/users/managers
   app.get('/users/managers', {
     onRequest: [
-    app.authenticate, // 1. Primeiro verifica se o token é válido
-    (request, reply) => verifyRole(request, reply, ['ADMIN']) // 2. Depois checa a role
-  ],
+      app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['ADMIN'])
+    ],
     schema: {
       tags: ['Users'],
       summary: 'List managers',
@@ -85,9 +98,12 @@ export async function userRoutes(app: FastifyInstance) {
           items: {
             type: 'object',
             properties: {
-              id: { type: 'string', format: 'uuid' },
+              id: { type: 'string' },
               name: { type: 'string' },
-              workArea: { type: 'object', properties: { name: { type: 'string' } } }
+              workArea: {
+                type: 'object',
+                properties: { name: { type: 'string' } }
+              }
             }
           }
         }
@@ -95,20 +111,50 @@ export async function userRoutes(app: FastifyInstance) {
     }
   }, listManagers);
 
+  // GET /api/users/team — equipe do gestor logado
+  app.get('/users/team', {
+    onRequest: [
+      app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])
+    ],
+    schema: {
+      tags: ['Users'],
+      summary: 'List team members of the logged manager',
+      security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              email: { type: 'string' },
+              role: { type: 'string' },
+              workArea: { type: 'string' },
+              progresso: { type: 'number' },
+              totalTasks: { type: 'number' },
+              completedTasks: { type: 'number' },
+            }
+          }
+        }
+      }
+    }
+  }, getTeam);
+
+  // PUT /api/users/:id
   app.put('/users/:id', {
     onRequest: [
-    app.authenticate, // 1. Primeiro verifica se o token é válido
-    (request, reply) => verifyRole(request, reply, ['ADMIN']) // 2. Depois checa a role
-  ],
+      app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['ADMIN'])
+    ],
     schema: {
       tags: ['Users'],
       summary: 'Update user data',
       params: {
         type: 'object',
         required: ['id'],
-        properties: {
-          id: { type: 'string', format: 'uuid' }
-        }
+        properties: { id: { type: 'string', format: 'uuid' } }
       },
       body: {
         type: 'object',
@@ -123,20 +169,19 @@ export async function userRoutes(app: FastifyInstance) {
     }
   }, replaceUser);
 
+  // PATCH /api/users/:id
   app.patch('/users/:id', {
     onRequest: [
-    app.authenticate, // 1. Primeiro verifica se o token é válido
-    (request, reply) => verifyRole(request, reply, ['ADMIN']) // 2. Depois checa a role
-  ],
+      app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR', 'COLABORADOR'])
+    ],
     schema: {
       tags: ['Users'],
       summary: 'Partial user data update',
       params: {
         type: 'object',
         required: ['id'],
-        properties: {
-          id: { type: 'string', format: 'uuid' }
-        }
+        properties: { id: { type: 'string', format: 'uuid' } }
       },
       body: {
         type: 'object',
@@ -152,20 +197,19 @@ export async function userRoutes(app: FastifyInstance) {
     }
   }, patchUser);
 
+  // DELETE /api/users/:id
   app.delete('/users/:id', {
     onRequest: [
-    app.authenticate, // 1. Primeiro verifica se o token é válido
-    (request, reply) => verifyRole(request, reply, ['ADMIN']) // 2. Depois checa a role
-  ],
+      app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['ADMIN'])
+    ],
     schema: {
       tags: ['Users'],
       summary: 'Deactivate user (Soft Delete)',
       params: {
         type: 'object',
         required: ['id'],
-        properties: {
-          id: { type: 'string', format: 'uuid' }
-        }
+        properties: { id: { type: 'string', format: 'uuid' } }
       },
       response: {
         200: {

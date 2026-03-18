@@ -4,14 +4,14 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #ffffff 50%, #b9bea4 50%);
+  background: linear-gradient(135deg, var(--cor-fundo) 50%, var(--cor-secundaria) 50%);
   font-family: "Poppins", Arial, sans-serif;
   padding: 20px;
 }
 
 /* === LOGO === */
 .aba-principal img {
-  width: 220px; /* aumentei o tamanho */
+  width: 220px;
   height: auto;
   margin-bottom: 25px;
   margin-left: 50px;
@@ -20,11 +20,9 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-
-
 /* === TÍTULO PRINCIPAL === */
 .aba-principal h1 {
-  color: #000000;
+  color: var(--cor-texto);
   font-size: 30px;
   margin-bottom: 35px;
   letter-spacing: 1px;
@@ -32,7 +30,7 @@
 
 /* === CONTAINER DE LOGIN === */
 .login-container {
-  background: #ffffff;
+  background: var(--cor-fundo);
   padding: 35px 30px;
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
@@ -40,6 +38,10 @@
   width: 320px;
   transition: all 0.3s ease;
   margin-bottom: 100px;
+}
+
+.login-container h2 {
+  color: var(--cor-texto);
 }
 
 .login-container:hover {
@@ -55,21 +57,30 @@
 
 .login-form input {
   padding: 12px;
-  border: 1px solid #b9bea4;
+  border: 1px solid var(--cor-secundaria);
   border-radius: 8px;
   font-size: 14px;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
   transition: all 0.2s ease-in-out;
 }
 
 .login-form input:focus {
   outline: none;
-  border-color: #8f9679;
-  box-shadow: 0 0 6px rgba(143, 150, 121, 0.5);
+  border-color: var(--cor-hover);
+  box-shadow: 0 0 6px var(--cor-circle-fundo);
+}
+
+/* === MENSAGEM DE ERRO === */
+.error-msg {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin: 0;
 }
 
 /* === BOTÕES === */
 .botao {
-  background-color: #aab193;
+  background-color: var(--cor-principal);
   border: none;
   padding: 12px;
   border-radius: 8px;
@@ -80,19 +91,26 @@
 }
 
 .botao:hover {
-  background-color: #8f9679;
+  background-color: var(--cor-hover);
   transform: scale(1.02);
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* === LINKS === */
 .link-redefinir {
   margin-top: 15px;
   font-size: 13px;
-  color: #333;
+  color: var(--cor-texto);
+  opacity: 0.8;
 }
 
 .link-redefinir a {
-  color: #6b705c;
+  color: var(--cor-principal);
   font-weight: 600;
   text-decoration: none;
   margin-left: 5px;
@@ -100,7 +118,7 @@
 }
 
 .link-redefinir a:hover {
-  color: #495037;
+  color: var(--cor-hover);
   text-decoration: underline;
 }
 

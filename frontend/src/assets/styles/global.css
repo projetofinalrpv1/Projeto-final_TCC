@@ -20,5 +20,5 @@ html, body, #root, .main-app-container {
   flex: 1; /* Ocupa todo o espaço restante ao lado da sidebar */
   overflow-y: auto; /* O scroll acontece APENAS aqui dentro */
   position: relative;
-  background-color: #f5f5f5; /* Cor de fundo base */
+background-color: var(--cor-fundo-sutil);  /* Cor de fundo base */
 }

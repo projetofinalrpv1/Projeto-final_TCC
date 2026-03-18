@@ -49,10 +49,7 @@ export const listManagers = async (request: FastifyRequest, reply: FastifyReply)
 };
 
 export const getTeam = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { managerId } = request.params as { managerId: string };
-  
-  const manager = await userService.executeGetDetails(managerId);
-  const team = await userService.executeGetTeam(managerId);
-
-  return reply.status(200).send({ manager, team });
+  const { sub } = request.user as { sub: string };
+  const team = await userService.executeGetTeam(sub);
+  return reply.status(200).send(team);
 };

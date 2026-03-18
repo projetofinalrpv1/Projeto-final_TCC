@@ -1,141 +1,105 @@
-import { useState } from "react";
-import "./Gestor.css";
+// src/pages/Gestor/Gestor.jsx
+import { useState, useEffect } from "react";
+import { useAuth } from "../../contexts/useAuth";
+import api from "../../service/api";
 import fotoGestor from "../../assets/david.png";
+import "./Gestor.css";
 
 export function Gestor() {
-  const [info, setInfo] = useState(null);
+  const { user, loading: authLoading } = useAuth();
+  const [equipe, setEquipe] = useState([]);
+  const [loadingEquipe, setLoadingEquipe] = useState(true);
 
-  const calculaFinalizacao = (data) => {
-    const [dia, mes, ano] = data.split("/").map(Number);
-    const date = new Date(ano, mes - 1, dia);
-    date.setMonth(date.getMonth() + 1);
-    return `${String(date.getDate()).padStart(2, "0")}/${String(
-      date.getMonth() + 1
-    ).padStart(2, "0")}/${date.getFullYear()}`;
-  };
+  useEffect(() => {
+    const token = localStorage.getItem('@App:token');
+    if (authLoading || !token) return;
 
-  const calculaProgresso = (data) => {
-    const [dia, mes, ano] = data.split("/").map(Number);
-    const inicio = new Date(ano, mes - 1, dia);
-    const final = new Date(inicio);
-    final.setMonth(final.getMonth() + 1);
-    const hoje = new Date();
+    async function fetchEquipe() {
+      setLoadingEquipe(true);
+      try {
+        const response = await api.get('/api/users/team');
+        setEquipe(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar equipe:', error);
+      } finally {
+        setLoadingEquipe(false);
+      }
+    }
 
-    const total = final - inicio;
-    const decorrido = hoje - inicio;
+    fetchEquipe();
+  }, [authLoading]);
 
-    let perc = Math.round((decorrido / total) * 100);
-    return Math.min(100, Math.max(0, perc));
-  };
-
-  const faseTreinamento = (data) => {
-    const p = calculaProgresso(data);
-    if (p < 35) return "inicio";
-    if (p < 70) return "meio";
+  const fasePorProgresso = (progresso) => {
+    if (progresso < 35) return "inicio";
+    if (progresso < 70) return "meio";
     return "final";
   };
 
-  const dados = {
-    gestor: {
-      nome: "Davi Luca",
-      setor: "Desenvolvimento",
-      descricao:
-        "Responsável pela coordenação da equipe de desenvolvimento.",
-      foto: fotoGestor
-    },
-    colaboradores: [
-      {
-        nome: "Ana Souza",
-        setor: "Desenvolvimento",
-        ingresso: "10/09/2025",
-        descricao: "Atua na implementação de novas funcionalidades."
-      },
-      {
-        nome: "Carlos Mendes",
-        setor: "Desenvolvimento",
-        ingresso: "15/09/2025",
-        descricao: "Especialista em manutenção de sistemas."
-      },
-      {
-        nome: "Júlia Rocha",
-        setor: "Desenvolvimento",
-        ingresso: "20/09/2025",
-        descricao: "Integração de APIs e otimização."
-      },
-      {
-        nome: "Marcos Lima",
-        setor: "Desenvolvimento",
-        ingresso: "22/09/2025",
-        descricao: "Testes automatizados e qualidade."
-      },
-      {
-        nome: "Fernanda Alves",
-        setor: "Desenvolvimento",
-        ingresso: "25/09/2025",
-        descricao: "Design de interfaces e UX."
-      }
-    ]
-  };
+  if (authLoading) return null;
 
   return (
     <div className="gestor-container">
       <header className="gestor-header">
-        <img
-          src={dados.gestor.foto}
-          alt="Gestor"
-          className="gestor-avatar"
-        />
+        <img src={fotoGestor} alt="Gestor" className="gestor-avatar" />
       </header>
 
       <main className="gestor-main">
-        {/* CARD DO GESTOR */}
+        {/* CARD DO GESTOR LOGADO */}
         <div className="gestor-card gestor-principal">
           <div className="gestor-foto">
-            <img src={dados.gestor.foto} alt={dados.gestor.nome} />
+            <img src={fotoGestor} alt={user?.name} />
           </div>
 
-          <span className="nome">{dados.gestor.nome}</span>
-          <span className="setor">{dados.gestor.setor}</span>
+          <span className="nome">{user?.name}</span>
+          <span className="setor">{user?.role}</span>
 
-          <div className="divider"></div>
+          <div className="divider" />
 
-          <p className="descricao">{dados.gestor.descricao}</p>
+          <p className="descricao">
+            Responsável pela coordenação da equipe.
+          </p>
         </div>
 
-        {/* COLABORADORES */}
-        <div className="gestor-organograma">
-          {dados.colaboradores.map((colab, index) => {
-            const progresso = calculaProgresso(colab.ingresso);
-            const fase = faseTreinamento(colab.ingresso);
+        {/* COLABORADORES DA EQUIPE */}
+        {loadingEquipe ? (
+          <p style={{ opacity: 0.6 }}>Carregando equipe...</p>
+        ) : equipe.length === 0 ? (
+          <p style={{ opacity: 0.6 }}>Nenhum colaborador encontrado na sua equipe.</p>
+        ) : (
+          <div className="gestor-organograma">
+            {equipe.map((membro) => {
+              const fase = fasePorProgresso(membro.progresso);
 
-            return (
-              <div className="colab-wrapper" key={index}>
-                <div className="gestor-card">
-                  <div className={`fase-indicador ${fase}`}></div>
+              return (
+                <div className="colab-wrapper" key={membro.id}>
+                  <div className="gestor-card">
+                    <div className={`fase-indicador ${fase}`} />
 
-                  <span className="nome">{colab.nome}</span>
-                  <span className="setor">{colab.setor}</span>
+                    <span className="nome">{membro.name}</span>
+                    <span className="setor">{membro.workArea}</span>
 
-                  <div className="divider"></div>
+                    <div className="divider" />
 
-                  <span className="treinamento">
-                    Início: {colab.ingresso}
-                  </span>
-                  <span className="treinamento">
-                    Previsão: {calculaFinalizacao(colab.ingresso)}
-                  </span>
+                    <span className="treinamento">
+                      Tarefas: {membro.completedTasks}/{membro.totalTasks}
+                    </span>
 
-                  <div className="barra-progresso">
-                    <div
-                      className="barra-preenchida"
-                      style={{ width: `${progresso}%` }}
-                    ></div>
+                    <div className="barra-progresso">
+                      <div
+                        className="barra-preenchida"
+                        style={{ width: `${membro.progresso}%` }}
+                      />
+                    </div>
+
+                    <span className="treinamento">
+                      {membro.progresso}% concluído
+                    </span>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );

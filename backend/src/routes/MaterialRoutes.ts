@@ -78,7 +78,7 @@ export async function materialRoutes(app: FastifyInstance) {
 
   // GET /api/materials/detalhes/:id
   app.get('/materials/detalhes/:id', {
-    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])],
+    onRequest: [(request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR', 'COLABORADOR'])],
     schema: {
       tags: ['Materiais'],
       summary: 'Busca todos os dados de um material específico pelo ID',

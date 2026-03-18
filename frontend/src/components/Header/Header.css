@@ -7,7 +7,7 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   height: 60px;
   box-sizing: border-box;
-  position: sticky; 
+  position: sticky;
   top: 0;
   z-index: 1000;
 }
@@ -36,6 +36,11 @@
   color: var(--cor-texto);
 }
 
+.perfil-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .perfil {
   width: 35px;
   height: 35px;
@@ -47,22 +52,10 @@
   justify-content: center;
   font-weight: bold;
   cursor: pointer;
-}
-
-.perfil-link {
-  text-decoration: none; /* Remove o sublinhado padrão de links */
-  color: inherit;       /* Mantém a cor original do texto */
-}
-
-.perfil {
-  cursor: pointer;
   transition: filter 0.2s;
-  /* Seus estilos atuais da div perfil aqui */
 }
 
-.perfil:hover {
-  filter: brightness(1.2); /* Efeito visual ao passar o mouse */
-}
+.perfil:hover { filter: brightness(1.2); }
 
 .perfil-container-google {
   position: relative;
@@ -73,7 +66,7 @@
 .perfil-circulo {
   width: 35px;
   height: 35px;
-  background: #d9534f; /* Cor do avatar no seu print */
+  background: #d9534f;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -83,17 +76,19 @@
   font-weight: bold;
 }
 
+/* ── Google Menu ── usa variáveis para adaptar ao tema */
 .google-menu {
   position: absolute;
   top: 50px;
   right: 0;
   width: 300px;
-  background: #e9eef6; /* Fundo azulado claro do Google */
+  background: var(--cor-fundo-sutil);
+  border: 1px solid var(--cor-secundaria);
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   z-index: 1000;
   padding: 15px;
-  color: #333;
+  color: var(--cor-texto);
 }
 
 .google-menu-header {
@@ -105,7 +100,8 @@
 
 .user-email {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--cor-texto);
+  opacity: 0.6;
   margin-bottom: 15px;
 }
 
@@ -124,18 +120,25 @@
 
 .btn-gerenciar {
   background: transparent;
-  border: 1px solid #747775;
+  border: 1px solid var(--cor-secundaria);
   padding: 10px 20px;
   border-radius: 20px;
-  color: #0b57d0;
+  color: var(--cor-principal);
   font-weight: 500;
   cursor: pointer;
   margin-top: 10px;
+  transition: 0.2s ease;
 }
 
+.btn-gerenciar:hover {
+  background-color: var(--cor-ativo-fundo);
+}
+
+/* Footer do menu */
 .google-menu-footer {
   display: flex;
-  background: white;
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-secundaria);
   border-radius: 15px;
   margin-top: 10px;
   overflow: hidden;
@@ -145,7 +148,8 @@
   flex: 1;
   padding: 15px;
   border: none;
-  background: white;
+  background: transparent;
+  color: var(--cor-texto);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,15 +159,8 @@
   transition: background 0.2s;
 }
 
-.footer-item:first-child { border-right: 1px solid #eee; }
-.footer-item:hover { background: #f1f1f1; }
-
-.google-menu-legal {
-  font-size: 0.7rem;
-  color: #777;
-  text-align: center;
-  margin-top: 15px;
-}
+.footer-item:first-child { border-right: 1px solid var(--cor-secundaria); }
+.footer-item:hover { background: var(--cor-fundo-sutil); }
 
 .button-group-vertical {
   display: flex;
@@ -175,11 +172,11 @@
 }
 
 .btn-admin {
-  background: #f8f9fa;
-  border: 1px solid #dadce0;
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-secundaria);
   padding: 8px 16px;
   border-radius: 20px;
-  color: #3c4043;
+  color: var(--cor-texto);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -189,16 +186,13 @@
   transition: background 0.2s;
 }
 
-.btn-admin:hover {
-  background: #f1f3f4;
-}
+.btn-admin:hover { background: var(--cor-fundo-sutil); }
 
-/* Overlay para fechar o menu ao clicar fora */
 .menu-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 999; /* Fica atrás do google-menu (1000) */
+  z-index: 999;
 }

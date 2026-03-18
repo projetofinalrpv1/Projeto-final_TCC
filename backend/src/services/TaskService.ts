@@ -125,11 +125,10 @@ async executeListMyTasks(userId: string, workAreaId: string, requester: any) {
   startOfToday.setHours(0, 0, 0, 0);
 
   for (const template of templates) {
-    const alreadyExists = await this.taskRepository.findTaskByTitleAndDate(
-      userId, 
-      template.title, 
-      startOfToday
-    );
+   const alreadyExists = await this.taskRepository.findTaskByUserAndTitle(
+  userId,
+  template.title
+);
 
     if (!alreadyExists) {
       await this.taskRepository.create({

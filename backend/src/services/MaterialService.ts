@@ -50,12 +50,17 @@ export class MaterialService {
   }
 
   async executeListByArea(workAreaId: string) {
-    const specificMaterials = await this.materialRepository.findByArea(workAreaId);
-    const defaultMaterials = await this.materialRepository.findDefaultMaterials();
+  const specificMaterials = await this.materialRepository.findByArea(workAreaId);
+  const defaultMaterials = await this.materialRepository.findDefaultMaterials();
 
-    // Mapeia todos os materiais para o padrão português antes de retornar
-    return [...specificMaterials, ...defaultMaterials].map(this.toDTO);
-  }
+  // Combina os dois arrays removendo duplicatas pelo id
+  const allMaterials = [...specificMaterials, ...defaultMaterials];
+  const unique = allMaterials.filter(
+    (material, index, self) => index === self.findIndex(m => m.id === material.id)
+  );
+
+  return unique.map(this.toDTO);
+}
 
   async executeGetDetails(id: string) {
     const material = await this.materialRepository.findById(id);

@@ -1,12 +1,14 @@
 .layout-container {
-  display: flex;         /* Coloca Sidebar e Main lado a lado */
+  display: flex;
   width: 100%;
-  min-height: calc(100vh - 60px); /* Altura total menos o Header */
+  min-height: calc(100vh - 60px);
+  background-color: var(--cor-fundo); /* ← adiciona */
 }
 
 .conteudo-principal {
   flex-grow: 1;
-  height: calc(100vh - 60px); /* Altura total menos o Header */
-  overflow-y: auto; /* O scroll acontece aqui dentro */
+  height: calc(100vh - 60px);
+  overflow-y: auto;
   position: relative;
+  background-color: var(--cor-fundo-sutil); /* ← adiciona */
 }

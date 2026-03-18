@@ -1,14 +1,7 @@
 /* ============================= */
-/* VARIÁVEIS */
+/* VARIÁVEIS LOCAIS — herdadas do tema global */
 /* ============================= */
 :root {
-  --cor-principal: #aab193;
-  --cor-secundaria: #b9bea4;
-  --cor-fundo: #ffffff;
-  --cor-fundo-pagina: #f4f6f2;
-  --cor-texto: #2f3e2f;
-  --cor-texto-sec: #5f6f5f;
-  --cor-borda: #e2e6dc;
   --cor-sucesso: #4caf50;
   --cor-alerta: #ffb300;
   --cor-info: #2196f3;
@@ -19,7 +12,7 @@
 ======================= */
 .gestor-container {
   min-height: 100vh;
-  background: var(--cor-fundo-pagina);
+  background: var(--cor-fundo-sutil);
   font-family: "Segoe UI", Arial, sans-serif;
   display: flex;
   flex-direction: column;
@@ -32,11 +25,7 @@
 .gestor-header {
   width: 100%;
   padding: 18px 30px;
-  background: linear-gradient(
-    90deg,
-    var(--cor-principal),
-    var(--cor-secundaria)
-  );
+  background: linear-gradient(90deg, var(--cor-principal), var(--cor-secundaria));
   display: flex;
   justify-content: flex-end;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
@@ -68,7 +57,7 @@
 ======================= */
 .gestor-card {
   background: var(--cor-fundo);
-  border: 1px solid var(--cor-borda);
+  border: 1px solid var(--cor-secundaria);
   border-radius: 20px;
   padding: 50px;
   width: 100%;
@@ -76,12 +65,10 @@
   text-align: center;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
   position: relative;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-
   transition: 0.3s ease;
 }
 
@@ -95,11 +82,7 @@
 ======================= */
 .gestor-principal {
   max-width: 750px;
-  background: linear-gradient(
-    135deg,
-    var(--cor-principal),
-    var(--cor-secundaria)
-  );
+  background: linear-gradient(135deg, var(--cor-principal), var(--cor-secundaria));
   border: none;
   border-radius: 28px;
   padding: 50px;
@@ -121,7 +104,7 @@
   height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  background: #fff;
+  background: var(--cor-fundo);
   border: 5px solid rgba(255, 255, 255, 0.6);
   margin-bottom: 15px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
@@ -144,13 +127,15 @@
 
 .setor {
   font-size: 14px;
-  color: var(--cor-texto-sec);
+  color: var(--cor-texto);
+  opacity: 0.65;
 }
 
 .descricao {
   font-size: 15px;
   line-height: 1.5;
   margin-top: 6px;
+  color: var(--cor-texto);
 }
 
 /* =======================
@@ -159,7 +144,7 @@
 .divider {
   width: 60%;
   height: 1px;
-  background: var(--cor-borda);
+  background: var(--cor-secundaria);
   margin: 14px 0;
   opacity: 0.6;
 }
@@ -180,7 +165,8 @@
 ======================= */
 .treinamento {
   font-size: 13px;
-  color: var(--cor-texto-sec);
+  color: var(--cor-texto);
+  opacity: 0.65;
 }
 
 /* =======================
@@ -189,21 +175,19 @@
 .barra-progresso {
   width: 100%;
   height: 8px;
-  background: #e6e9df;
+  background: var(--cor-secundaria);
   border-radius: 20px;
   margin-top: 15px;
   overflow: hidden;
+  opacity: 0.5;
 }
 
 .barra-preenchida {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--cor-principal),
-    var(--cor-secundaria)
-  );
+  background: linear-gradient(90deg, var(--cor-principal), var(--cor-secundaria));
   border-radius: 20px;
   transition: width 0.4s ease;
+  opacity: 1;
 }
 
 /* =======================
@@ -216,34 +200,18 @@
   position: absolute;
   top: 18px;
   right: 18px;
-  box-shadow: 0 0 0 3px #fff;
+  box-shadow: 0 0 0 3px var(--cor-fundo);
 }
 
-.fase-indicador.inicio {
-  background: var(--cor-sucesso);
-}
-
-.fase-indicador.meio {
-  background: var(--cor-alerta);
-}
-
-.fase-indicador.final {
-  background: var(--cor-info);
-}
+.fase-indicador.inicio { background: var(--cor-sucesso); }
+.fase-indicador.meio   { background: var(--cor-alerta); }
+.fase-indicador.final  { background: var(--cor-info); }
 
 /* =======================
    RESPONSIVO
 ======================= */
 @media (max-width: 768px) {
-  .gestor-main {
-    gap: 50px;
-  }
-
-  .gestor-principal {
-    padding: 35px 25px;
-  }
-
-  .gestor-card {
-    padding: 26px;
-  }
+  .gestor-main { gap: 50px; }
+  .gestor-principal { padding: 35px 25px; }
+  .gestor-card { padding: 26px; }
 }

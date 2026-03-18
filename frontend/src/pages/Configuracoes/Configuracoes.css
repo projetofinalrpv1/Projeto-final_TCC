@@ -1,174 +1,186 @@
-:root {
-  --cor-principal: #aab193;
-  --cor-secundaria: #b9bea4;
-  --cor-hover: #8f9679;
-  --cor-fundo: #ffffff;
-  --cor-texto: #1f2a1f;
-  --cor-fundo-sutil: #f4f6ef;
-  --cor-ativo-fundo: #e4ead3;
-  --cor-destaque: #6f7c5a;
-
-  --color-alert: #dc3545;
-  --color-alert-hover: #bd2130;
-}
-
-/* =========================
-   CONTAINER PRINCIPAL
-========================= */
-
 .configuracoes-pagina {
-  padding: 50px 60px;
-  background: linear-gradient(180deg, #f4f6ef 0%, #eef2e3 100%);
-  min-height: 100vh;
+  padding: 40px 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* =========================
-   TÍTULO PRINCIPAL
-========================= */
-
-.configuracoes-pagina h2 {
-  font-size: 32px;
+.config-header h2 {
+  font-size: 28px;
   font-weight: 700;
   color: var(--cor-texto);
-  margin-bottom: 10px;
-  position: relative;
+  margin-bottom: 6px;
 }
 
-.configuracoes-pagina h2::after {
-  content: "";
-  display: block;
-  width: 80px;
-  height: 4px;
-  background: var(--cor-principal);
-  margin-top: 10px;
-  border-radius: 4px;
+.config-header p {
+  font-size: 0.95rem;
+  color: var(--cor-texto);
+  opacity: 0.6;
+  margin: 0;
 }
 
-.configuracoes-pagina p {
-  color: #4e5b45;
-  margin-bottom: 45px;
-  font-size: 16px;
-}
-
-/* =========================
-   SEÇÕES (CARDS)
-========================= */
-
+/* Seções */
 .secao-config {
-  background: var(--cor-fundo);
+  background-color: var(--cor-fundo);
   border: 1px solid var(--cor-secundaria);
-  border-radius: 18px;
-  padding: 35px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  transition: 0.3s ease;
-}
-
-.secao-config:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
 }
 
 .secao-config h3 {
-  font-size: 20px;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--cor-destaque);
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  color: var(--cor-principal);
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--cor-secundaria);
 }
-
-/* =========================
-   LISTA GERAL
-========================= */
 
 .secao-config ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .secao-config ul li {
-  padding: 14px 0;
-  border-bottom: 1px solid var(--cor-fundo-sutil);
-  color: #3d4a36;
-  font-size: 15px;
-}
-
-.secao-config ul li:last-child {
-  border-bottom: none;
-}
-
-/* =========================
-   BOTÕES PADRÃO
-========================= */
-
-.secao-config button {
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s ease;
-  margin-right: 15px;
-  margin-top: 10px;
-}
-
-/* Botão primário */
-.btn-primary {
-  background: var(--cor-principal);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--cor-hover);
-}
-
-/* Botão alerta */
-.btn-alert {
-  background: var(--color-alert);
-  color: white;
-}
-
-.btn-alert:hover {
-  background: var(--color-alert-hover);
-}
-
-/* Botão neutro */
-.btn-secondary {
-  background: var(--cor-ativo-fundo);
+  font-size: 0.95rem;
   color: var(--cor-texto);
 }
 
-.btn-secondary:hover {
-  background: var(--cor-secundaria);
+/* Row de config com toggle */
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* =========================
-   RESPONSIVIDADE
-========================= */
-
-@media (max-width: 768px) {
-  .configuracoes-pagina {
-    padding: 30px 20px;
-  }
-
-  .secao-config {
-    padding: 25px;
-  }
-
-  .secao-config button {
-    display: block;
-    width: 100%;
-    margin-right: 0;
-  }
+.config-row strong {
+  font-size: 0.95rem;
+  color: var(--cor-texto);
 }
 
+.config-descricao {
+  font-size: 0.82rem;
+  color: var(--cor-texto);
+  opacity: 0.55;
+  margin: 2px 0 0 0;
+}
+
+/* Toggle switch */
+.toggle-btn {
+  width: 48px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  background-color: var(--cor-secundaria);
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.25s ease;
+  flex-shrink: 0;
+}
+
+.toggle-btn.ativo {
+  background-color: var(--cor-principal);
+}
+
+.toggle-bolinha {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: transform 0.25s ease;
+  display: block;
+}
+
+.toggle-btn.ativo .toggle-bolinha {
+  transform: translateX(22px);
+}
+
+/* Botões */
 .botoes-config {
   display: flex;
-  flex-wrap: wrap;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
+.btn-primary {
+  background-color: var(--cor-principal);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-alert {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: 0.2s ease;
+}
+
+.btn-alert:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Formulário de senha */
+.senha-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 360px;
+  margin-top: 8px;
+}
+
+.senha-input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--cor-secundaria);
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-size: 0.9rem;
+  transition: 0.2s ease;
+}
+
+.senha-input:focus {
+  outline: none;
+  border-color: var(--cor-principal);
+  box-shadow: 0 0 0 3px var(--cor-circle-fundo);
+}
+
+.senha-msg {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.senha-msg.sucesso { color: #27ae60; }
+.senha-msg.erro { color: #e74c3c; }

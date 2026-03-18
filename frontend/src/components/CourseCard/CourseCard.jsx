@@ -1,10 +1,16 @@
-// src/components/CourseCard/CourseCard.jsx
-import { Link } from "react-router-dom";
+// src/pages/Home/CourseCard.jsx
+import { useNavigate } from "react-router-dom";
 
-export function CourseCard({ id, titulo, gestor, rota, onDelete, canDelete }) {
+export function CourseCard({ id, titulo, gestor, onDelete, canDelete }) {
+  const navigate = useNavigate();
+
   return (
     <div className="bloco-curso-wrapper">
-      <Link to={rota || "#"} className="bloco-curso-link">
+      <div
+        className="bloco-curso-link"
+        onClick={() => navigate(`/app/material/${id}`)}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="bloco-curso">
           <div className="bloco-curso-topo" />
           <div className="bloco-curso-conteudo">
@@ -15,7 +21,7 @@ export function CourseCard({ id, titulo, gestor, rota, onDelete, canDelete }) {
             <span className="tag-conteudo">Material Estratégico</span>
           </div>
         </div>
-      </Link>
+      </div>
 
       {canDelete && (
         <button className="botao-excluir" onClick={() => onDelete(id)}>

@@ -26,14 +26,23 @@ export class TaskRepository {
     });
   }
 
-  async findTemplatesByArea(workAreaId: string) {
-    return await prisma.task.findMany({
-      where: {
-        workAreaId: workAreaId,
-        isTemplate: true
+async findTemplatesByArea(workAreaId: string) {
+  // Busca o id da área Geral dinamicamente
+  const areaGeral = await prisma.workArea.findFirst({
+    where: { name: 'Geral' }
+  });
+
+  return await prisma.task.findMany({
+    where: {
+      isTemplate: true,
+      workAreaId: {
+        in: areaGeral
+          ? [workAreaId, areaGeral.id] // área do usuário + Geral
+          : [workAreaId]               // só área do usuário se Geral não existir
       }
-    });
-  }
+    }
+  });
+}
 
   async createMany(tasks: any[]) {
     return await prisma.task.createMany({
@@ -138,6 +147,18 @@ async findByUserAndDate(userId: string, date: Date) {
       userId,
       isTemplate: false,
       createdAt: { gte: date }
+    }
+  });
+
+  
+}
+
+async findTaskByUserAndTitle(userId: string, title: string) {
+  return await prisma.task.findFirst({
+    where: {
+      userId,
+      title,
+      isTemplate: false
     }
   });
 }

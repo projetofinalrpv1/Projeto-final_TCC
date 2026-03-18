@@ -1,10 +1,23 @@
+/* TEMA CLARO (padrão) */
 :root {
-  --cor-principal: #aab193; 
-  --cor-secundaria: #b9bea4; 
-  --cor-hover: #8f9679; 
-  --cor-fundo: #ffffff; 
-  --cor-texto: #000000; 
-  --cor-fundo-sutil: #f7f7f7; 
-  --cor-ativo-fundo: #e0e6c9; 
-  --cor-circle-fundo: rgba(170, 177, 147, 0.2); 
+  --cor-principal: #aab193;
+  --cor-secundaria: #b9bea4;
+  --cor-hover: #8f9679;
+  --cor-fundo: #ffffff;
+  --cor-texto: #000000;
+  --cor-fundo-sutil: #f7f7f7;
+  --cor-ativo-fundo: #e0e6c9;
+  --cor-circle-fundo: rgba(170, 177, 147, 0.2);
+}
+ 
+/* TEMA ESCURO */
+[data-theme="dark"] {
+  --cor-principal: #aab193;
+  --cor-secundaria: #4a4f3e;
+  --cor-hover: #8f9679;
+  --cor-fundo: #1e1e1e;
+  --cor-texto: #f0f0f0;
+  --cor-fundo-sutil: #2a2a2a;
+  --cor-ativo-fundo: #3a3f2e;
+  --cor-circle-fundo: rgba(170, 177, 147, 0.15);
 }

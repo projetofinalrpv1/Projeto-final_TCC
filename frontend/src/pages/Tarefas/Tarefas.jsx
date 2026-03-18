@@ -1,177 +1,211 @@
-import React, { useState, useMemo } from "react";
+// src/pages/Tarefas/Tarefas.jsx
+import { useState, useEffect, useMemo } from "react";
+import { useAuth } from "../../contexts/useAuth";
+import api from "../../service/api";
 import "./tarefas.css";
 
-export function Tarefas() {
-  const [tarefas, setTarefas] = useState([
-    { id: 1, label: "Configurar computador e softwares essenciais", dia: "25", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
-    { id: 2, label: "Revisar políticas internas e compliance", dia: "26", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
-    { id: 3, label: "Participar do treinamento de segurança da informação", dia: "27", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
-    { id: 4, label: "Configuração do ambiente de desenvolvimento", dia: "28", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
-    { id: 5, label: "Primeira tarefa prática supervisionada", dia: "29", mes: "Set", ano: "2025", setor: "Desenvolvimento" },
-  ]);
+// ── Prioridade ──
+const prioridadeLabel = { LOW: 'Baixa', MEDIUM: 'Média', HIGH: 'Alta' };
+const prioridadeCor = { LOW: '#4caf50', MEDIUM: '#ffb300', HIGH: '#e74c3c' };
 
-  const [checklist, setChecklist] = useState({});
-  const [assinatura, setAssinatura] = useState("");
+export function Tarefas() {
+  const { user, loading: authLoading } = useAuth();
+  const podeGerenciar = ['ADMIN', 'GESTOR'].includes(user?.role);
+
+  const [tarefas, setTarefas] = useState([]);
+  const [loadingTarefas, setLoadingTarefas] = useState(true);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [loadingSalvar, setLoadingSalvar] = useState(false);
+  const [assinatura, setAssinatura] = useState("");
 
   const [novaTarefa, setNovaTarefa] = useState({
-    label: "",
-    dia: "",
-    mes: "",
-    ano: "",
-    setor: ""
+    title: "",
+    description: "",
+    priority: "MEDIUM",
+    isTemplate: false,
+    userId: "",
   });
 
-  const meses = [
-    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
-    "Jul", "Ago", "Set", "Out", "Nov", "Dez"
-  ];
+  // ── Busca tarefas conforme o role ──
+  useEffect(() => {
+    const token = localStorage.getItem('@App:token');
+    if (authLoading || !token) return;
 
-  const handleCheckboxChange = (id) => {
-    setChecklist((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
+    async function fetchTarefas() {
+      setLoadingTarefas(true);
+      try {
+        // COLABORADOR vê suas próprias tarefas
+        // GESTOR/ADMIN veem todas as tarefas da área
+        const rota = podeGerenciar ? '/api/tasks/area' : '/api/tasks/my';
+        const response = await api.get(rota);
+        setTarefas(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar tarefas:', error);
+      } finally {
+        setLoadingTarefas(false);
+      }
+    }
 
+    fetchTarefas();
+  }, [authLoading]);
+
+  // ── Atualiza status da tarefa ──
+  async function handleCheckboxChange(tarefa) {
+    const novoStatus = tarefa.status === 'COMPLETED' ? 'PENDING' : 'COMPLETED';
+
+    // Otimistic update — atualiza UI antes da resposta
+    setTarefas(prev =>
+      prev.map(t => t.id === tarefa.id ? { ...t, status: novoStatus } : t)
+    );
+
+    try {
+      await api.patch(`/api/tasks/${tarefa.id}/status`, { status: novoStatus });
+    } catch (error) {
+      // Reverte se falhar
+      setTarefas(prev =>
+        prev.map(t => t.id === tarefa.id ? { ...t, status: tarefa.status } : t)
+      );
+      alert('Erro ao atualizar tarefa.');
+    }
+  }
+
+  // ── Criar tarefa (GESTOR/ADMIN) ──
+  async function adicionarTarefa(e) {
+    e.preventDefault();
+    if (!novaTarefa.title) return;
+
+    setLoadingSalvar(true);
+    try {
+      const payload = {
+        title: novaTarefa.title,
+        description: novaTarefa.description,
+        priority: novaTarefa.priority,
+        isTemplate: novaTarefa.isTemplate,
+        workAreaId: user.workAreaId,
+        ...(novaTarefa.userId && { userId: novaTarefa.userId }),
+      };
+
+      const response = await api.post('/api/tasks', payload);
+      setTarefas(prev => [...prev, response.data]);
+      setMostrarFormulario(false);
+      setNovaTarefa({ title: "", description: "", priority: "MEDIUM", isTemplate: false, userId: "" });
+    } catch (error) {
+      alert(error.response?.data?.message || 'Erro ao criar tarefa.');
+    } finally {
+      setLoadingSalvar(false);
+    }
+  }
+
+  // ── Excluir tarefa (GESTOR/ADMIN) ──
+  async function handleDelete(id) {
+    if (!confirm('Deseja excluir esta tarefa?')) return;
+    try {
+      await api.delete(`/api/tasks/${id}`);
+      setTarefas(prev => prev.filter(t => t.id !== id));
+    } catch (error) {
+      alert(error.response?.data?.message || 'Erro ao excluir tarefa.');
+    }
+  }
+
+  // ── Progresso ──
   const progressoPercentual = useMemo(() => {
-    const total = tarefas.length;
-    const concluidas = Object.values(checklist).filter(Boolean).length;
-    return total === 0 ? 0 : Math.round((concluidas / total) * 100);
-  }, [checklist, tarefas]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (progressoPercentual < 100) {
-      alert("Você precisa concluir todas as tarefas antes de finalizar.");
-      return;
-    }
-
-    if (!assinatura.trim()) {
-      alert("Preencha o campo de assinatura.");
-      return;
-    }
-
-    alert(`Treinamento finalizado com sucesso!\nAssinado por: ${assinatura}`);
-  };
-
-  const adicionarTarefa = (e) => {
-    e.preventDefault();
-
-    if (!novaTarefa.label || !novaTarefa.dia || !novaTarefa.mes || !novaTarefa.ano || !novaTarefa.setor) {
-      alert("Preencha todos os campos da nova atividade.");
-      return;
-    }
-
-    const novoId = tarefas.length + 1;
-
-    setTarefas([
-      ...tarefas,
-      { id: novoId, ...novaTarefa }
-    ]);
-
-    setChecklist((prev) => ({
-      ...prev,
-      [novoId]: false
-    }));
-
-    setNovaTarefa({
-      label: "",
-      dia: "",
-      mes: "",
-      ano: "",
-      setor: ""
-    });
-
-    setMostrarFormulario(false);
-  };
+    if (tarefas.length === 0) return 0;
+    const concluidas = tarefas.filter(t => t.status === 'COMPLETED').length;
+    return Math.round((concluidas / tarefas.length) * 100);
+  }, [tarefas]);
 
   const concluido = progressoPercentual === 100;
+
+  // ── Finalizar (placeholder para PDF/assinatura) ──
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (progressoPercentual < 100) {
+      alert('Conclua todas as tarefas antes de finalizar.');
+      return;
+    }
+    if (!assinatura.trim()) {
+      alert('Preencha o campo de assinatura.');
+      return;
+    }
+    // TODO: implementar geração de PDF com assinatura
+    alert(`Treinamento finalizado!\nAssinado por: ${assinatura}`);
+  }
+
+  if (authLoading) return null;
 
   return (
     <div className="container">
       <div className="form-card">
-        <h2>Treinamento de Integração - Setor de Desenvolvimento</h2>
+        <h2>
+          {podeGerenciar
+            ? 'Tarefas da Área'
+            : 'Meu Treinamento de Integração'}
+        </h2>
 
+        {/* Barra de progresso */}
         <div className="progress-bar-container">
           <div
-            className={`progress-bar-fill ${concluido ? "complete" : ""}`}
+            className={`progress-bar-fill ${concluido ? 'complete' : ''}`}
             style={{ width: `${progressoPercentual}%` }}
           >
-            {progressoPercentual}%
+            {progressoPercentual > 10 && `${progressoPercentual}%`}
           </div>
         </div>
 
-        <button
-          type="button"
-          className="criar-button"
-          onClick={() => setMostrarFormulario(true)}
-        >
-          + Criar Atividade
-        </button>
+        {/* Botão criar tarefa — só GESTOR/ADMIN */}
+        {podeGerenciar && (
+          <button
+            type="button"
+            className="criar-button"
+            onClick={() => setMostrarFormulario(true)}
+          >
+            + Criar Tarefa
+          </button>
+        )}
 
+        {/* Modal de criação */}
         {mostrarFormulario && (
           <div className="modal">
             <form className="modal-content" onSubmit={adicionarTarefa}>
-              <h3>Nova Atividade</h3>
+              <h3>Nova Tarefa</h3>
 
               <input
                 type="text"
-                placeholder="Descrição"
-                value={novaTarefa.label}
-                onChange={(e) =>
-                  setNovaTarefa({ ...novaTarefa, label: e.target.value })
-                }
+                placeholder="Título da tarefa *"
+                value={novaTarefa.title}
+                onChange={e => setNovaTarefa(prev => ({ ...prev, title: e.target.value }))}
+                required
               />
 
               <input
-                type="number"
-                placeholder="Dia"
-                min="1"
-                max="31"
-                value={novaTarefa.dia}
-                onChange={(e) =>
-                  setNovaTarefa({ ...novaTarefa, dia: e.target.value })
-                }
+                type="text"
+                placeholder="Descrição (opcional)"
+                value={novaTarefa.description}
+                onChange={e => setNovaTarefa(prev => ({ ...prev, description: e.target.value }))}
               />
 
               <select
-                value={novaTarefa.mes}
-                onChange={(e) =>
-                  setNovaTarefa({ ...novaTarefa, mes: e.target.value })
-                }
+                value={novaTarefa.priority}
+                onChange={e => setNovaTarefa(prev => ({ ...prev, priority: e.target.value }))}
               >
-                <option value="">Selecione o mês</option>
-                {meses.map((mes, index) => (
-                  <option key={index} value={mes}>
-                    {mes}
-                  </option>
-                ))}
+                <option value="LOW">Prioridade Baixa</option>
+                <option value="MEDIUM">Prioridade Média</option>
+                <option value="HIGH">Prioridade Alta</option>
               </select>
 
-              <input
-                type="number"
-                placeholder="Ano"
-                min="2020"
-                max="2100"
-                value={novaTarefa.ano}
-                onChange={(e) =>
-                  setNovaTarefa({ ...novaTarefa, ano: e.target.value })
-                }
-              />
-
-              <input
-                type="text"
-                placeholder="Setor"
-                value={novaTarefa.setor}
-                onChange={(e) =>
-                  setNovaTarefa({ ...novaTarefa, setor: e.target.value })
-                }
-              />
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.9rem' }}>
+                <input
+                  type="checkbox"
+                  checked={novaTarefa.isTemplate}
+                  onChange={e => setNovaTarefa(prev => ({ ...prev, isTemplate: e.target.checked }))}
+                />
+                É um template (aplica para todos da área)
+              </label>
 
               <div className="modal-buttons">
-                <button type="submit">Salvar</button>
+                <button type="submit" disabled={loadingSalvar}>
+                  {loadingSalvar ? 'Salvando...' : 'Salvar'}
+                </button>
                 <button type="button" onClick={() => setMostrarFormulario(false)}>
                   Cancelar
                 </button>
@@ -180,38 +214,77 @@ export function Tarefas() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          {tarefas.map((tarefa) => (
-            <div key={tarefa.id} className="checkbox-item">
-              <label>
-                {tarefa.label}
-                <span className="task-info">
-                  {tarefa.dia}/{tarefa.mes}/{tarefa.ano} • {tarefa.setor}
-                </span>
-              </label>
+        {/* Lista de tarefas */}
+        {loadingTarefas ? (
+          <p style={{ opacity: 0.6, textAlign: 'center', padding: '20px' }}>
+            Carregando tarefas...
+          </p>
+        ) : tarefas.length === 0 ? (
+          <p style={{ opacity: 0.6, textAlign: 'center', padding: '20px' }}>
+            Nenhuma tarefa encontrada.
+          </p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            {tarefas.map((tarefa) => (
+              <div key={tarefa.id} className="checkbox-item">
+                <label>
+                  {tarefa.title}
+                  <span className="task-info">
+                    {tarefa.description && `${tarefa.description} • `}
+                    <span style={{ color: prioridadeCor[tarefa.priority], fontWeight: 600 }}>
+                      {prioridadeLabel[tarefa.priority]}
+                    </span>
+                    {tarefa.user?.name && ` • ${tarefa.user.name}`}
+                  </span>
+                </label>
 
-              <input
-                type="checkbox"
-                checked={checklist[tarefa.id] || false}
-                onChange={() => handleCheckboxChange(tarefa.id)}
-              />
-            </div>
-          ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {/* Excluir — só GESTOR/ADMIN */}
+                  {podeGerenciar && (
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(tarefa.id)}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#e74c3c',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      ✕
+                    </button>
+                  )}
 
-          <div className="assinatura-field">
-            <label>Assinatura (Nome Completo)</label>
-            <input
-              type="text"
-              value={assinatura}
-              onChange={(e) => setAssinatura(e.target.value)}
-              placeholder="Digite seu nome para assinar"
-            />
-          </div>
+                  <input
+                    type="checkbox"
+                    checked={tarefa.status === 'COMPLETED'}
+                    onChange={() => handleCheckboxChange(tarefa)}
+                  />
+                </div>
+              </div>
+            ))}
 
-          <button type="submit" className="submit-button">
-            Finalizar
-          </button>
-        </form>
+            {/* Assinatura — só para COLABORADOR quando tudo estiver concluído */}
+            {!podeGerenciar && (
+              <div className="assinatura-field">
+                <label>Assinatura (Nome Completo)</label>
+                <input
+                  type="text"
+                  value={assinatura}
+                  onChange={e => setAssinatura(e.target.value)}
+                  placeholder="Digite seu nome para assinar"
+                />
+              </div>
+            )}
+
+            {!podeGerenciar && (
+              <button type="submit" className="submit-button">
+                Finalizar Treinamento
+              </button>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );
