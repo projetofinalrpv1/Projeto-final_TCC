@@ -59,7 +59,7 @@ export class UserService {
     
     return team.map(member => {
       const totalTasks = member.tasks.length;
-      const completedTasks = member.tasks.filter(t => t.status === 'CONCLUIDO' || t.status === 'DONE').length;
+      const completedTasks = member.tasks.filter(t => t.status === 'CONCLUIDO' || t.status === 'COMPLETED').length;
       
       const progresso = totalTasks > 0 
         ? Math.round((completedTasks / totalTasks) * 100) 

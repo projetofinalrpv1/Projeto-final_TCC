@@ -114,33 +114,34 @@ export async function userRoutes(app: FastifyInstance) {
   // GET /api/users/team — equipe do gestor logado
   app.get('/users/team', {
     onRequest: [
-      app.authenticate,
-      (request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])
-    ],
-    schema: {
-      tags: ['Users'],
-      summary: 'List team members of the logged manager',
-      security: [{ bearerAuth: [] }],
-      response: {
-        200: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'string' },
-              name: { type: 'string' },
-              email: { type: 'string' },
-              role: { type: 'string' },
-              workArea: { type: 'string' },
-              progresso: { type: 'number' },
-              totalTasks: { type: 'number' },
-              completedTasks: { type: 'number' },
-            }
+    app.authenticate,
+    (request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])
+  ],
+  schema: {
+    tags: ['Users'],
+    summary: 'List team members of the logged manager',
+    security: [{ bearerAuth: [] }],
+    response: {
+      200: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            email: { type: 'string' },
+            role: { type: 'string' },
+            workArea: { type: 'string' },
+            progresso: { type: 'number' },
+            totalTasks: { type: 'number' },
+            completedTasks: { type: 'number' },
+            createdAt: { type: 'string' },
           }
         }
       }
     }
-  }, getTeam);
+  }
+}, getTeam);
 
   // PUT /api/users/:id
   app.put('/users/:id', {

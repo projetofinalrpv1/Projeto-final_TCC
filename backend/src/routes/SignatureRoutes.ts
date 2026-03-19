@@ -1,3 +1,4 @@
+// src/routes/SignatureRoutes.ts
 import { FastifyInstance } from 'fastify';
 import { 
   finalizeChecklist, 
@@ -7,7 +8,7 @@ import {
 
 export async function signatureRoutes(app: FastifyInstance) {
 
-  // 1. Rota Finalizar Checklist
+  // POST /api/tasks/finalize
   app.post('/tasks/finalize', {
     onRequest: [app.authenticate],
     schema: {
@@ -21,11 +22,16 @@ export async function signatureRoutes(app: FastifyInstance) {
           signature: { type: 'string' }
         }
       },
-      response: { 201: { type: 'object', properties: { message: { type: 'string' } } } }
+      response: {
+        201: {
+          type: 'object',
+          properties: { message: { type: 'string' } }
+        }
+      }
     }
   }, finalizeChecklist);
 
-  // 2. Rota Listar Pendências
+  // GET /api/signatures/pending
   app.get('/signatures/pending', {
     onRequest: [app.authenticate],
     schema: {
@@ -39,7 +45,15 @@ export async function signatureRoutes(app: FastifyInstance) {
             properties: {
               id: { type: 'string' },
               status: { type: 'string' },
-              employee: { type: 'object', properties: { name: { type: 'string' } } }
+              employeeSignature: { type: 'string' },
+              completedAt: { type: 'string' },
+              employee: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  email: { type: 'string' }
+                }
+              }
             }
           }
         }
@@ -47,17 +61,26 @@ export async function signatureRoutes(app: FastifyInstance) {
     }
   }, listPendingSignatures);
 
-  // 3. Rota Aprovar Assinatura
+  // PATCH /api/signatures/:id/approve
   app.patch('/signatures/:id/approve', {
     onRequest: [app.authenticate],
     schema: {
       tags: ['Assinaturas'],
       summary: 'Gestor aprova o documento de assinatura',
-      params: { type: 'object', properties: { id: { type: 'string' } } },
+      params: {
+        type: 'object',
+        properties: { id: { type: 'string' } }
+      },
       body: {
         type: 'object',
         required: ['signature'],
         properties: { signature: { type: 'string' } }
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: { message: { type: 'string' } }
+        }
       }
     }
   }, approveSignature);

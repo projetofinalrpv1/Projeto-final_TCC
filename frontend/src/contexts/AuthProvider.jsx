@@ -9,24 +9,28 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadUser() {
-      const savedToken = localStorage.getItem('@App:token');
-      const savedUser = localStorage.getItem('@App:user');
+  async function loadUser() {
+    const savedToken = localStorage.getItem('@App:token');
 
-      if (savedToken && savedUser) {
-        try {
-          await api.get('/auth/me');
-          setUser(JSON.parse(savedUser));
-        } catch (error) {
-          console.log('ERRO NO /auth/me:', error.response?.status, error.response?.data);
-          localStorage.removeItem('@App:token');
-          localStorage.removeItem('@App:user');
-        }
+    if (savedToken) {
+      try {
+        // Usa os dados frescos do backend em vez do localStorage
+        const response = await api.get('/auth/me');
+        const freshUser = response.data;
+
+        // Atualiza o localStorage com os dados corretos
+        localStorage.setItem('@App:user', JSON.stringify(freshUser));
+        setUser(freshUser);
+      } catch (error) {
+        console.log('ERRO NO /auth/me:', error.response?.status, error.response?.data);
+        localStorage.removeItem('@App:token');
+        localStorage.removeItem('@App:user');
       }
-      setLoading(false);
     }
-    loadUser();
-  }, []);
+    setLoading(false);
+  }
+  loadUser();
+}, []);
 
   async function signIn({ email, password }) {
     try {
