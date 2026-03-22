@@ -66,7 +66,24 @@ export class UserRepository {
     });
   }
 
-
+// Adicione este método no UserRepository.ts
+async getAdminDashboard() {
+  return await prisma.user.findMany({
+    where: { role: 'GESTOR', isActive: true },
+    include: {
+      workArea: { select: { id: true, name: true } },
+      subordinates: {
+        where: { isActive: true },
+        include: {
+          tasks: {
+            where: { isTemplate: false },
+            select: { status: true }
+          }
+        }
+      }
+    }
+  });
+}
 }
 
 export const userRepository = new UserRepository();

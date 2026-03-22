@@ -1,65 +1,79 @@
 // src/pages/Tarefas/Tarefas.jsx
 import { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "../../contexts/useAuth";
 import api from "../../service/api";
 import { jsPDF } from "jspdf";
 import "./tarefas.css";
-
+import { LOGO_BASE64 } from "../../assets/logo";
 const prioridadeLabel = { LOW: 'Baixa', MEDIUM: 'Média', HIGH: 'Alta' };
 const prioridadeCor = { LOW: '#4caf50', MEDIUM: '#ffb300', HIGH: '#e74c3c' };
 
-// ── Gera PDF do colaborador ──
+
+
+
 function gerarPDFColaborador(user, tarefas, assinatura) {
   const doc = new jsPDF();
   const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-  // Cabeçalho
-  doc.setFontSize(20);
+  // 1. Configuração da Logo (Nova lógica de centralização)
+  // Posicionamento: 85mm da esquerda (para centralizar 40mm em um A4 de 210mm)
+  // Tamanho: 40x40 para manter a nitidez dos elementos vazados da logo
+  doc.addImage(LOGO_BASE64, 'PNG', 85, 10, 40, 40);
+
+  // 2. Cabeçalho com Identidade Visual
+  doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('ON THE JOB', 105, 20, { align: 'center' });
+  // Ajustamos o Y para 55 para dar respiro abaixo da logo
+  doc.text('ON THE JOB', 105, 55, { align: 'center' }); 
 
-  doc.setFontSize(13);
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
-  doc.text('Checklist de Treinamento de Integração', 105, 30, { align: 'center' });
+  doc.text('Checklist de Treinamento de Integração', 105, 63, { align: 'center' });
 
-  doc.setLineWidth(0.5);
-  doc.line(20, 35, 190, 35);
+  // Linha decorativa com a cor verde oliva da logo (aproximada: R:124, G:140, B:93)
+  doc.setDrawColor(124, 140, 93); 
+  doc.setLineWidth(0.8);
+  doc.line(20, 68, 190, 68);
 
-  // Dados do colaborador
+  // 3. Informações do Colaborador
   doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0); // Garante que o texto volte ao preto
+  
   doc.setFont('helvetica', 'bold');
-  doc.text('Colaborador:', 20, 45);
+  doc.text('Colaborador:', 20, 77);
   doc.setFont('helvetica', 'normal');
-  doc.text(user.name, 60, 45);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Email:', 20, 53);
-  doc.setFont('helvetica', 'normal');
-  doc.text(user.email, 60, 53);
+  doc.text(user.name, 50, 77);
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Data:', 20, 61);
+  doc.text('Email:', 20, 84);
   doc.setFont('helvetica', 'normal');
-  doc.text(dataHoje, 60, 61);
+  doc.text(user.email, 50, 84);
 
-  doc.line(20, 67, 190, 67);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Data:', 20, 91);
+  doc.setFont('helvetica', 'normal');
+  doc.text(dataHoje, 50, 91);
 
-  // Tarefas
+  doc.setDrawColor(200, 200, 200); // Linha cinza clara para separação
+  doc.line(20, 96, 190, 96);
+
+  // 4. Seção de Tarefas
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('Tarefas Concluídas:', 20, 76);
+  doc.text('Tarefas Concluídas:', 20, 105);
 
-  let y = 85;
+  let y = 114;
   tarefas.forEach((tarefa, index) => {
-    if (y > 260) {
-      doc.addPage();
-      y = 20;
-    }
+    if (y > 260) { doc.addPage(); y = 20; }
+    
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.text(`${index + 1}. ${tarefa.title}`, 25, y);
+    
     if (tarefa.description) {
-      doc.setTextColor(120, 120, 120);
+      doc.setTextColor(100, 100, 100);
+      doc.setFontSize(9);
       doc.text(`   ${tarefa.description}`, 25, y + 5);
       doc.setTextColor(0, 0, 0);
       y += 12;
@@ -68,26 +82,82 @@ function gerarPDFColaborador(user, tarefas, assinatura) {
     }
   });
 
-  // Assinatura do colaborador
+  // 5. Rodapé de Assinaturas
   y += 15;
+  if (y > 250) { doc.addPage(); y = 30; } // Evita que a assinatura fique cortada
+  
+  doc.setDrawColor(124, 140, 93);
   doc.line(20, y, 190, y);
+  
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text('Assinatura do Colaborador:', 20, y + 10);
+  
   doc.setFont('helvetica', 'normal');
   doc.text(assinatura, 20, y + 20);
-  doc.text(`Data: ${dataHoje}`, 20, y + 28);
+  doc.setFontSize(9);
+  doc.text(`Data da Finalização: ${dataHoje}`, 20, y + 26);
 
-  // Espaço para gestor
-  y += 45;
-  doc.line(20, y, 190, y);
+  y += 40;
+  doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
-  doc.text('Assinatura do Gestor:', 20, y + 10);
+  doc.text('Assinatura do Gestor:', 20, y);
   doc.setFont('helvetica', 'normal');
-  doc.text('_______________________________', 20, y + 20);
-  doc.text('Data: ___/___/______', 20, y + 28);
+  doc.text('_______________________________', 20, y + 10);
+  doc.setFontSize(9);
+  doc.text('Data: ___/___/______', 20, y + 16);
 
   doc.save(`checklist_${user.name.replace(/\s/g, '_')}_${dataHoje.replace(/\//g, '-')}.pdf`);
+}
+
+// ── Modal renderizado no body via Portal ──
+function ModalNovaTarefa({ novaTarefa, setNovaTarefa, onSubmit, onClose, loadingSalvar }) {
+  return createPortal(
+    <div
+      className="modal"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <form className="modal-content" onSubmit={onSubmit}>
+        <h3>Nova Tarefa</h3>
+        <input
+          type="text"
+          placeholder="Título da tarefa *"
+          value={novaTarefa.title}
+          onChange={e => setNovaTarefa(prev => ({ ...prev, title: e.target.value }))}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Descrição (opcional)"
+          value={novaTarefa.description}
+          onChange={e => setNovaTarefa(prev => ({ ...prev, description: e.target.value }))}
+        />
+        <select
+          value={novaTarefa.priority}
+          onChange={e => setNovaTarefa(prev => ({ ...prev, priority: e.target.value }))}
+        >
+          <option value="LOW">Prioridade Baixa</option>
+          <option value="MEDIUM">Prioridade Média</option>
+          <option value="HIGH">Prioridade Alta</option>
+        </select>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.9rem', color: 'var(--cor-texto)' }}>
+          <input
+            type="checkbox"
+            checked={novaTarefa.isTemplate}
+            onChange={e => setNovaTarefa(prev => ({ ...prev, isTemplate: e.target.checked }))}
+          />
+          É um template (aplica para todos da área)
+        </label>
+        <div className="modal-buttons">
+          <button type="submit" disabled={loadingSalvar}>
+            {loadingSalvar ? 'Salvando...' : 'Salvar'}
+          </button>
+          <button type="button" onClick={onClose}>Cancelar</button>
+        </div>
+      </form>
+    </div>,
+    document.body
+  );
 }
 
 export function Tarefas() {
@@ -165,10 +235,8 @@ export function Tarefas() {
     }
   }
 
-  // ── Finalizar: gera PDF + envia para o backend ──
   async function handleFinalizar(e) {
     e.preventDefault();
-
     if (progressoPercentual < 100) {
       alert('Conclua todas as tarefas antes de finalizar.');
       return;
@@ -177,18 +245,13 @@ export function Tarefas() {
       alert('Preencha o campo de assinatura.');
       return;
     }
-
     setLoadingFinalizar(true);
     try {
-      // 1. Envia para o backend criar o processo de assinatura
       await api.post('/api/tasks/finalize', {
         workAreaId: user.workAreaId,
         signature: assinatura,
       });
-
-      // 2. Gera e baixa o PDF localmente
       gerarPDFColaborador(user, tarefas, assinatura);
-
       setFinalizado(true);
     } catch (error) {
       alert(error.response?.data?.message || 'Erro ao finalizar treinamento.');
@@ -227,49 +290,6 @@ export function Tarefas() {
           </button>
         )}
 
-        {mostrarFormulario && (
-          <div className="modal">
-            <form className="modal-content" onSubmit={adicionarTarefa}>
-              <h3>Nova Tarefa</h3>
-              <input
-                type="text"
-                placeholder="Título da tarefa *"
-                value={novaTarefa.title}
-                onChange={e => setNovaTarefa(prev => ({ ...prev, title: e.target.value }))}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Descrição (opcional)"
-                value={novaTarefa.description}
-                onChange={e => setNovaTarefa(prev => ({ ...prev, description: e.target.value }))}
-              />
-              <select
-                value={novaTarefa.priority}
-                onChange={e => setNovaTarefa(prev => ({ ...prev, priority: e.target.value }))}
-              >
-                <option value="LOW">Prioridade Baixa</option>
-                <option value="MEDIUM">Prioridade Média</option>
-                <option value="HIGH">Prioridade Alta</option>
-              </select>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.9rem' }}>
-                <input
-                  type="checkbox"
-                  checked={novaTarefa.isTemplate}
-                  onChange={e => setNovaTarefa(prev => ({ ...prev, isTemplate: e.target.checked }))}
-                />
-                É um template (aplica para todos da área)
-              </label>
-              <div className="modal-buttons">
-                <button type="submit" disabled={loadingSalvar}>
-                  {loadingSalvar ? 'Salvando...' : 'Salvar'}
-                </button>
-                <button type="button" onClick={() => setMostrarFormulario(false)}>Cancelar</button>
-              </div>
-            </form>
-          </div>
-        )}
-
         {loadingTarefas ? (
           <p style={{ opacity: 0.6, textAlign: 'center', padding: '20px' }}>Carregando tarefas...</p>
         ) : tarefas.length === 0 ? (
@@ -305,7 +325,6 @@ export function Tarefas() {
               </div>
             ))}
 
-            {/* Assinatura e finalização — só COLABORADOR */}
             {!podeGerenciar && (
               <>
                 {finalizado ? (
@@ -342,6 +361,16 @@ export function Tarefas() {
           </form>
         )}
       </div>
+
+      {mostrarFormulario && (
+        <ModalNovaTarefa
+          novaTarefa={novaTarefa}
+          setNovaTarefa={setNovaTarefa}
+          onSubmit={adicionarTarefa}
+          onClose={() => setMostrarFormulario(false)}
+          loadingSalvar={loadingSalvar}
+        />
+      )}
     </div>
   );
 }

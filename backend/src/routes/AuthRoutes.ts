@@ -1,6 +1,6 @@
 // src/routes/AuthRoutes.ts
 import { FastifyInstance } from 'fastify';
-import { login, me } from '../controllers/AuthController';
+import { login, me, resetPassword } from '../controllers/AuthController';
 
 export async function authRoutes(app: FastifyInstance) {
   // POST /auth/login — pública
@@ -36,6 +36,30 @@ export async function authRoutes(app: FastifyInstance) {
       },
     },
   }, login);
+
+  // Adicione essa rota no seu AuthRoutes.ts existente
+
+// POST /auth/reset-password — rota pública
+app.post('/reset-password', {
+  schema: {
+    tags: ['Auth'],
+    summary: 'Redefine a senha do usuário pelo e-mail',
+    body: {
+      type: 'object',
+      required: ['email', 'password'],
+      properties: {
+        email: { type: 'string', format: 'email' },
+        password: { type: 'string', minLength: 6 },
+      }
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: { message: { type: 'string' } }
+      }
+    }
+  }
+}, resetPassword);
 
   // GET /auth/me — protegida
   app.get('/me', {

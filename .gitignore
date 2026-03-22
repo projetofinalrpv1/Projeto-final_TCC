@@ -23,7 +23,7 @@ pnpm-debug.log*
 # mas permite as migrations (que são o histórico do banco)
 /backend/prisma/dev.db
 /backend/prisma/dev.db-journal
-
+/backend/whatsapp_auth
 # --- IDEs / Editores ---
 .vscode/*
 !.vscode/extensions.json

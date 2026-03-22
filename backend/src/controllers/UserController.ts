@@ -52,4 +52,12 @@ export const getTeam = async (request: FastifyRequest, reply: FastifyReply) => {
   const { sub } = request.user as { sub: string };
   const team = await userService.executeGetTeam(sub);
   return reply.status(200).send(team);
+
+  
 };
+
+// Adicione no UserController.ts
+export async function getAdminDashboard(request: FastifyRequest, reply: FastifyReply) {
+  const data = await userService.executeAdminDashboard();
+  return reply.send(data);
+}

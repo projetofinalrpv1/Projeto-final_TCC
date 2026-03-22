@@ -9,11 +9,12 @@ export default function Form({ fechar, usuarioEditando }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     role: "COLABORADOR",
     workAreaId: "",
     managerId: "",
-    dataInicio: "", // apenas visual, não vai para a API
+    dataInicio: "",
   });
 
   const [workareas, setWorkareas] = useState([]);
@@ -21,9 +22,6 @@ export default function Form({ fechar, usuarioEditando }) {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // -------------------------------------------------------
-  // Carrega workareas e gestores ao abrir o formulário
-  // -------------------------------------------------------
   useEffect(() => {
     async function carregarSelects() {
       try {
@@ -40,15 +38,13 @@ export default function Form({ fechar, usuarioEditando }) {
     carregarSelects();
   }, []);
 
-  // -------------------------------------------------------
-  // Preenche o formulário se for edição
-  // -------------------------------------------------------
   useEffect(() => {
     if (isEdicao) {
       setFormData({
         name: usuarioEditando.name || "",
         email: usuarioEditando.email || "",
-        password: "", // senha não é preenchida na edição
+        phone: usuarioEditando.phone || "",
+        password: "",
         role: usuarioEditando.role || "COLABORADOR",
         workAreaId: usuarioEditando.workAreaId || "",
         managerId: usuarioEditando.managerId || "",
@@ -62,9 +58,6 @@ export default function Form({ fechar, usuarioEditando }) {
     setFormData(prev => ({ ...prev, [name]: value }));
   }
 
-  // -------------------------------------------------------
-  // Submit: POST (cadastro) ou PATCH (edição)
-  // -------------------------------------------------------
   async function handleSubmit(e) {
     e.preventDefault();
     setErrorMsg("");
@@ -72,10 +65,10 @@ export default function Form({ fechar, usuarioEditando }) {
 
     try {
       if (isEdicao) {
-        // PATCH — só envia campos alterados
         const payload = {
           name: formData.name,
           email: formData.email,
+          phone: formData.phone || null,
           role: formData.role,
           workAreaId: formData.workAreaId,
           managerId: formData.role === 'GESTOR' ? null : formData.managerId || null,
@@ -83,10 +76,10 @@ export default function Form({ fechar, usuarioEditando }) {
         };
         await api.patch(`/api/users/${usuarioEditando.id}`, payload);
       } else {
-        // POST — cadastro completo
         const payload = {
           name: formData.name,
           email: formData.email,
+          phone: formData.phone || null,
           password: formData.password,
           role: formData.role,
           workAreaId: formData.workAreaId,
@@ -95,7 +88,7 @@ export default function Form({ fechar, usuarioEditando }) {
         await api.post('/api/users', payload);
       }
 
-      fechar(); // fecha e recarrega a tabela
+      fechar();
     } catch (error) {
       setErrorMsg(error.response?.data?.message || 'Erro ao salvar usuário.');
     } finally {
@@ -126,6 +119,26 @@ export default function Form({ fechar, usuarioEditando }) {
             onChange={handleChange}
             required
           />
+
+          {/* Telefone — obrigatório para GESTOR (receberá o lembrete),
+              opcional para COLABORADOR */}
+          <label>
+            Telefone (WhatsApp)
+            {formData.role === 'GESTOR' && (
+              <span style={{ color: '#e74c3c', marginLeft: 4 }}>*</span>
+            )}
+          </label>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="Ex: 5511999999999 (com DDI e DDD)"
+            required={formData.role === 'GESTOR'}
+          />
+          <small style={{ opacity: 0.6, fontSize: '0.78rem', marginTop: -6 }}>
+            Formato: DDI + DDD + número (ex: 5511999999999)
+          </small>
 
           <label>{isEdicao ? 'Nova Senha (deixe em branco para manter)' : 'Senha'}</label>
           <input
@@ -184,7 +197,6 @@ export default function Form({ fechar, usuarioEditando }) {
             </label>
           </div>
 
-          {/* Gestor responsável — só aparece se for COLABORADOR */}
           {formData.role === 'COLABORADOR' && (
             <>
               <label>Gestor Responsável</label>

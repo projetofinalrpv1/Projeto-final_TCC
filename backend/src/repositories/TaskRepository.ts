@@ -131,11 +131,14 @@ async countByStatus(workAreaId: string) {
 async findByArea(workAreaId: string) {
   return await prisma.task.findMany({
     where: {
-      workAreaId,
-      isTemplate: false // Não lista os moldes, apenas execuções
+      isTemplate: false,
+      user: {
+        workAreaId: workAreaId, // ← filtra pelo workAreaId do USUÁRIO, não da tarefa
+        isActive: true
+      }
     },
     include: {
-      user: { select: { name: true } } // Inclui o nome do colaborador responsável
+      user: { select: { name: true } }
     },
     orderBy: { createdAt: 'desc' }
   });

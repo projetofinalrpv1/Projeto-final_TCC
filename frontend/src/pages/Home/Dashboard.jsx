@@ -1,18 +1,110 @@
 // src/pages/Home/Dashboard.jsx
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "../../contexts/useAuth";
 import api from "../../service/api";
 import { CourseCard } from "../../components/CourseCard/CourseCard";
+import { AdminDashboard } from "./AdminDashboard";
 import "./Dashboard.css";
+
+// ── Modal via Portal ──
+function ModalMaterial({ novoConteudo, setNovoConteudo, onSalvar, onFechar, loadingSalvar, errorMsg, gestores, isAdmin }) {
+  return createPortal(
+    <div
+      className="modal-overlay"
+      onClick={e => { if (e.target === e.currentTarget) onFechar(); }}
+    >
+      <div className="modal-container">
+        <h3 className="modal-titulo">Novo Material de Apoio</h3>
+
+        <input
+          type="text"
+          placeholder="Título do material *"
+          value={novoConteudo.titulo}
+          onChange={e => setNovoConteudo(prev => ({ ...prev, titulo: e.target.value }))}
+          className="modal-input"
+        />
+
+        {isAdmin ? (
+          <select
+            value={novoConteudo.gestor}
+            onChange={e => setNovoConteudo(prev => ({ ...prev, gestor: e.target.value }))}
+            className="modal-input"
+          >
+            <option value="">Selecione o Gestor responsável *</option>
+            {gestores.map(g => (
+              <option key={g.id} value={g.name}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="text"
+            value={novoConteudo.gestor}
+            className="modal-input"
+            readOnly
+            style={{ opacity: 0.7, cursor: 'not-allowed' }}
+          />
+        )}
+
+        <input
+          type="text"
+          placeholder="Descrição breve *"
+          value={novoConteudo.descricao}
+          onChange={e => setNovoConteudo(prev => ({ ...prev, descricao: e.target.value }))}
+          className="modal-input"
+        />
+        <input
+          type="url"
+          placeholder="Link do arquivo (Google Drive, etc.) *"
+          value={novoConteudo.arquivoUrl}
+          onChange={e => setNovoConteudo(prev => ({ ...prev, arquivoUrl: e.target.value }))}
+          className="modal-input"
+        />
+        <input
+          type="text"
+          placeholder="Rota interna (opcional, ex: /app/curso/arq)"
+          value={novoConteudo.rota}
+          onChange={e => setNovoConteudo(prev => ({ ...prev, rota: e.target.value }))}
+          className="modal-input"
+        />
+
+        {errorMsg && (
+          <p style={{ color: '#e74c3c', fontSize: '0.85rem', margin: '4px 0' }}>
+            {errorMsg}
+          </p>
+        )}
+
+        <div className="modal-botoes">
+          <button className="botao-secundario" onClick={onFechar}>
+            Cancelar
+          </button>
+          <button
+            className="botao-primario"
+            onClick={onSalvar}
+            disabled={loadingSalvar}
+          >
+            {loadingSalvar ? "Salvando..." : "Salvar"}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
 
 export function Dashboard() {
   const { user, loading: authLoading } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+  const podeGerenciar = ['ADMIN', 'GESTOR'].includes(user?.role);
 
   const [courses, setCourses] = useState([]);
   const [loadingMateriais, setLoadingMateriais] = useState(true);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [loadingSalvar, setLoadingSalvar] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [gestores, setGestores] = useState([]);
 
   const [novoConteudo, setNovoConteudo] = useState({
     titulo: "",
@@ -22,14 +114,9 @@ export function Dashboard() {
     rota: "",
   });
 
-  const podeGerenciar = ['ADMIN', 'GESTOR'].includes(user?.role);
-
+  // Busca materiais
   useEffect(() => {
-    // Espera o AuthContext terminar de carregar E o token estar disponível
     const token = localStorage.getItem('@App:token');
-  console.log('authLoading:', authLoading);
-  console.log('user:', user);
-  console.log('token:', token);
     if (authLoading || !user?.workAreaId || !token) return;
 
     async function fetchMaterials() {
@@ -45,7 +132,27 @@ export function Dashboard() {
     }
 
     fetchMaterials();
-  }, [user, authLoading]); // depende do authLoading também
+  }, [user, authLoading]);
+
+  // Busca gestores (só ADMIN precisa)
+  useEffect(() => {
+    if (!isAdmin) return;
+    api.get('/api/users/managers')
+      .then(res => setGestores(res.data))
+      .catch(err => console.error('Erro ao buscar gestores:', err));
+  }, [isAdmin]);
+
+  function handleAbrirModal() {
+    setNovoConteudo({
+      titulo: "",
+      gestor: isAdmin ? "" : user?.name || "",
+      descricao: "",
+      arquivoUrl: "",
+      rota: "",
+    });
+    setErrorMsg("");
+    setMostrarModal(true);
+  }
 
   async function adicionarConteudo() {
     const { titulo, gestor, descricao, arquivoUrl } = novoConteudo;
@@ -70,7 +177,6 @@ export function Dashboard() {
 
       setCourses(prev => [...prev, response.data]);
       setMostrarModal(false);
-      setNovoConteudo({ titulo: "", gestor: "", descricao: "", arquivoUrl: "", rota: "" });
     } catch (error) {
       setErrorMsg(error.response?.data?.message || "Erro ao salvar material.");
     } finally {
@@ -88,11 +194,14 @@ export function Dashboard() {
     }
   }
 
-  // Enquanto o auth ainda está carregando, não renderiza nada
   if (authLoading) return null;
 
   return (
     <div className="conteudo-pagina">
+
+      {/* ── PAINEL ADMIN — só visível para ADMIN ── */}
+      {isAdmin && <AdminDashboard />}
+
       <h2 className="titulo-secao">Adaptação</h2>
 
       <div className="bloco-atividades">
@@ -109,7 +218,7 @@ export function Dashboard() {
       <div className="topo-conteudos">
         <h2 className="titulo-secao">Conteúdos recomendados</h2>
         {podeGerenciar && (
-          <button className="botao-primario" onClick={() => setMostrarModal(true)}>
+          <button className="botao-primario" onClick={handleAbrirModal}>
             + Adicionar conteúdo
           </button>
         )}
@@ -140,69 +249,16 @@ export function Dashboard() {
       )}
 
       {mostrarModal && (
-        <div className="modal-overlay">
-          <div className="modal-container">
-            <h3 className="modal-titulo">Novo Material de Apoio</h3>
-
-            <input
-              type="text"
-              placeholder="Título do material *"
-              value={novoConteudo.titulo}
-              onChange={e => setNovoConteudo(prev => ({ ...prev, titulo: e.target.value }))}
-              className="modal-input"
-            />
-            <input
-              type="text"
-              placeholder="Nome do Gestor responsável *"
-              value={novoConteudo.gestor}
-              onChange={e => setNovoConteudo(prev => ({ ...prev, gestor: e.target.value }))}
-              className="modal-input"
-            />
-            <input
-              type="text"
-              placeholder="Descrição breve *"
-              value={novoConteudo.descricao}
-              onChange={e => setNovoConteudo(prev => ({ ...prev, descricao: e.target.value }))}
-              className="modal-input"
-            />
-            <input
-              type="url"
-              placeholder="Link do arquivo (Google Drive, etc.) *"
-              value={novoConteudo.arquivoUrl}
-              onChange={e => setNovoConteudo(prev => ({ ...prev, arquivoUrl: e.target.value }))}
-              className="modal-input"
-            />
-            <input
-              type="text"
-              placeholder="Rota interna (opcional, ex: /app/curso/arq)"
-              value={novoConteudo.rota}
-              onChange={e => setNovoConteudo(prev => ({ ...prev, rota: e.target.value }))}
-              className="modal-input"
-            />
-
-            {errorMsg && (
-              <p style={{ color: '#e74c3c', fontSize: '0.85rem', margin: '4px 0' }}>
-                {errorMsg}
-              </p>
-            )}
-
-            <div className="modal-botoes">
-              <button
-                className="botao-secundario"
-                onClick={() => { setMostrarModal(false); setErrorMsg(""); }}
-              >
-                Cancelar
-              </button>
-              <button
-                className="botao-primario"
-                onClick={adicionarConteudo}
-                disabled={loadingSalvar}
-              >
-                {loadingSalvar ? "Salvando..." : "Salvar"}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalMaterial
+          novoConteudo={novoConteudo}
+          setNovoConteudo={setNovoConteudo}
+          onSalvar={adicionarConteudo}
+          onFechar={() => { setMostrarModal(false); setErrorMsg(""); }}
+          loadingSalvar={loadingSalvar}
+          errorMsg={errorMsg}
+          gestores={gestores}
+          isAdmin={isAdmin}
+        />
       )}
     </div>
   );

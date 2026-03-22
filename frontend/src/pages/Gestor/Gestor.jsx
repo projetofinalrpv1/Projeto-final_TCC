@@ -6,68 +6,161 @@ import { jsPDF } from "jspdf";
 import { GestorAlertas } from "./GestorAlertas";
 import fotoGestor from "../../assets/david.png";
 import "./Gestor.css";
+import { LOGO_BASE64 } from "../../assets/logo";
 
-function gerarPDFAprovado(processo, assinaturaGestor, nomeGestor) {
+// ── PDF aprovado com ambas as assinaturas ──
+function gerarPDFAprovado(processo, tarefas, assinaturaGestor, nomeGestor) {
   const doc = new jsPDF();
   const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-  doc.setFontSize(20);
+  // Logo
+  doc.addImage(LOGO_BASE64, 'PNG', 88, 8, 34, 34);
+
+  doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('ON THE JOB', 105, 20, { align: 'center' });
-
-  doc.setFontSize(13);
+  doc.text('ON THE JOB', 105, 50, { align: 'center' });
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
-  doc.text('Checklist de Treinamento — APROVADO', 105, 30, { align: 'center' });
-
+  doc.text('Checklist de Treinamento — APROVADO', 105, 58, { align: 'center' });
   doc.setLineWidth(0.5);
-  doc.line(20, 35, 190, 35);
+  doc.line(20, 63, 190, 63);
 
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
-  doc.text('Colaborador:', 20, 45);
+  doc.text('Colaborador:', 20, 72);
   doc.setFont('helvetica', 'normal');
-  doc.text(processo.employee?.name || '—', 60, 45);
-
+  doc.text(processo.employee?.name || '—', 60, 72);
   doc.setFont('helvetica', 'bold');
-  doc.text('Email:', 20, 53);
+  doc.text('Email:', 20, 80);
   doc.setFont('helvetica', 'normal');
-  doc.text(processo.employee?.email || '—', 60, 53);
-
+  doc.text(processo.employee?.email || '—', 60, 80);
   doc.setFont('helvetica', 'bold');
-  doc.text('Data de conclusão:', 20, 61);
+  doc.text('Data de conclusão:', 20, 88);
   doc.setFont('helvetica', 'normal');
-  const dataConclusao = processo.completedAt
-    ? new Date(processo.completedAt).toLocaleDateString('pt-BR')
-    : dataHoje;
-  doc.text(dataConclusao, 60, 61);
-
-  doc.line(20, 67, 190, 67);
+  doc.text(processo.completedAt ? new Date(processo.completedAt).toLocaleDateString('pt-BR') : dataHoje, 60, 88);
+  doc.line(20, 93, 190, 93);
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('Assinatura do Colaborador:', 20, 80);
-  doc.setFont('helvetica', 'normal');
+  doc.text('Tarefas Concluídas:', 20, 102);
+
+  let y = 111;
+  if (tarefas && tarefas.length > 0) {
+    tarefas.forEach((tarefa, index) => {
+      if (y > 255) { doc.addPage(); y = 20; }
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`${index + 1}. ${tarefa.title}`, 25, y);
+      if (tarefa.description) {
+        doc.setTextColor(120, 120, 120);
+        doc.text(`   ${tarefa.description}`, 25, y + 5);
+        doc.setTextColor(0, 0, 0);
+        y += 12;
+      } else {
+        y += 8;
+      }
+    });
+  } else {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('Nenhuma tarefa registrada.', 25, y);
+    y += 8;
+  }
+
+  y += 10;
+  doc.line(20, y, 190, y);
   doc.setFontSize(11);
-  doc.text(processo.employeeSignature || '—', 20, 90);
-
-  doc.line(20, 100, 190, 100);
-
-  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('Assinatura do Gestor:', 20, 113);
+  doc.text('Assinatura do Colaborador:', 20, y + 10);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(11);
-  doc.text(assinaturaGestor, 20, 123);
-  doc.text(`Gestor: ${nomeGestor}`, 20, 131);
-  doc.text(`Data de aprovação: ${dataHoje}`, 20, 139);
+  doc.text(processo.employeeSignature || '—', 20, y + 20);
 
-  doc.line(20, 148, 190, 148);
+  y += 35;
+  doc.line(20, y, 190, y);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Assinatura do Gestor:', 20, y + 10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(assinaturaGestor, 20, y + 20);
+  doc.text(`Gestor: ${nomeGestor}`, 20, y + 28);
+  doc.text(`Data de aprovação: ${dataHoje}`, 20, y + 36);
 
+  doc.line(20, y + 45, 190, y + 45);
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
-  doc.text('Documento gerado automaticamente pelo sistema ON THE JOB.', 105, 160, { align: 'center' });
+  doc.text('Documento gerado automaticamente pelo sistema ON THE JOB.', 105, y + 55, { align: 'center' });
 
   doc.save(`aprovado_${processo.employee?.name?.replace(/\s/g, '_')}_${dataHoje.replace(/\//g, '-')}.pdf`);
+}
+
+// ── PDF de visualização (só checklist do colaborador) ──
+function visualizarChecklistPDF(processo, tarefas) {
+  const doc = new jsPDF();
+  const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+  // Logo
+  doc.addImage(LOGO_BASE64, 'PNG', 88, 8, 34, 34);
+
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ON THE JOB', 105, 50, { align: 'center' });
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Checklist de Treinamento — Aguardando Aprovação', 105, 58, { align: 'center' });
+  doc.setLineWidth(0.5);
+  doc.line(20, 63, 190, 63);
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Colaborador:', 20, 72);
+  doc.setFont('helvetica', 'normal');
+  doc.text(processo.employee?.name || '—', 60, 72);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Email:', 20, 80);
+  doc.setFont('helvetica', 'normal');
+  doc.text(processo.employee?.email || '—', 60, 80);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Finalizado em:', 20, 88);
+  doc.setFont('helvetica', 'normal');
+  doc.text(processo.completedAt ? new Date(processo.completedAt).toLocaleDateString('pt-BR') : dataHoje, 60, 88);
+  doc.line(20, 93, 190, 93);
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Tarefas Concluídas:', 20, 102);
+
+  let y = 111;
+  if (tarefas && tarefas.length > 0) {
+    tarefas.forEach((tarefa, index) => {
+      if (y > 255) { doc.addPage(); y = 20; }
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`✓ ${index + 1}. ${tarefa.title}`, 25, y);
+      if (tarefa.description) {
+        doc.setTextColor(120, 120, 120);
+        doc.text(`   ${tarefa.description}`, 25, y + 5);
+        doc.setTextColor(0, 0, 0);
+        y += 12;
+      } else {
+        y += 8;
+      }
+    });
+  }
+
+  y += 15;
+  doc.line(20, y, 190, y);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Assinatura do Colaborador:', 20, y + 10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(processo.employeeSignature || '—', 20, y + 20);
+
+  y += 35;
+  doc.line(20, y, 190, y);
+  doc.setFontSize(10);
+  doc.setTextColor(150, 150, 150);
+  doc.text('[ Aguardando assinatura do gestor ]', 105, y + 12, { align: 'center' });
+
+  doc.save(`checklist_${processo.employee?.name?.replace(/\s/g, '_')}_preview.pdf`);
 }
 
 export function Gestor() {
@@ -79,40 +172,58 @@ export function Gestor() {
   const [loadingPendencias, setLoadingPendencias] = useState(true);
   const [assinaturas, setAssinaturas] = useState({});
   const [loadingAprovar, setLoadingAprovar] = useState({});
+  const [loadingChecklist, setLoadingChecklist] = useState({});
+  const [tarefasPorProcesso, setTarefasPorProcesso] = useState({});
 
- useEffect(() => {
-  const token = localStorage.getItem('@App:token');
-  if (authLoading || !token || !user?.workAreaId) return;
+  useEffect(() => {
+    const token = localStorage.getItem('@App:token');
+    if (authLoading || !token || !user?.workAreaId) return;
 
-  async function fetchDados() {
+    async function fetchDados() {
+      try {
+        const [equipeRes, pendenciasRes] = await Promise.all([
+          api.get('/api/users/team'),
+          api.get('/api/signatures/pending'),
+        ]);
+        setEquipe(equipeRes.data);
+        setPendencias(pendenciasRes.data);
+      } catch (error) {
+        console.error('Erro ao buscar dados do gestor:', error);
+      } finally {
+        setLoadingEquipe(false);
+        setLoadingPendencias(false);
+      }
+    }
+
+    fetchDados();
+
+    const intervalo = setInterval(() => {
+      api.get('/api/signatures/pending')
+        .then(res => setPendencias(res.data))
+        .catch(() => {});
+    }, 15000);
+
+    return () => clearInterval(intervalo);
+  }, [user?.workAreaId, authLoading]);
+
+  async function handleVerChecklist(processo) {
+    if (tarefasPorProcesso[processo.id]) {
+      visualizarChecklistPDF(processo, tarefasPorProcesso[processo.id]);
+      return;
+    }
+
+    setLoadingChecklist(prev => ({ ...prev, [processo.id]: true }));
     try {
-      const [equipeRes, pendenciasRes] = await Promise.all([
-        api.get('/api/users/team'),
-        api.get('/api/signatures/pending'),
-      ]);
-      setEquipe(equipeRes.data);
-      setPendencias(pendenciasRes.data);
+      const response = await api.get(`/api/tasks/user/${processo.employeeId}`);
+      const tarefas = response.data;
+      setTarefasPorProcesso(prev => ({ ...prev, [processo.id]: tarefas }));
+      visualizarChecklistPDF(processo, tarefas);
     } catch (error) {
-      console.error('Erro ao buscar dados do gestor:', error);
+      alert('Erro ao buscar checklist do colaborador.');
     } finally {
-      setLoadingEquipe(false);
-      setLoadingPendencias(false);
+      setLoadingChecklist(prev => ({ ...prev, [processo.id]: false }));
     }
   }
-
-  fetchDados();
-
-  // ← Adiciona isso: verifica a cada 15 segundos
-  const intervalo = setInterval(() => {
-    api.get('/api/signatures/pending')
-      .then(res => setPendencias(res.data))
-      .catch(() => {});
-  }, 15000);
-
-  // ← Limpa o intervalo quando o componente desmonta
-  return () => clearInterval(intervalo);
-
-}, [user?.workAreaId, authLoading]);
 
   async function handleAprovar(processo) {
     const assinatura = assinaturas[processo.id];
@@ -124,9 +235,11 @@ export function Gestor() {
     setLoadingAprovar(prev => ({ ...prev, [processo.id]: true }));
     try {
       await api.patch(`/api/signatures/${processo.id}/approve`, { signature: assinatura });
-      gerarPDFAprovado(processo, assinatura, user.name);
+      const tarefas = tarefasPorProcesso[processo.id] || [];
+      gerarPDFAprovado(processo, tarefas, assinatura, user.name);
       setPendencias(prev => prev.filter(p => p.id !== processo.id));
       setAssinaturas(prev => { const n = { ...prev }; delete n[processo.id]; return n; });
+      setTarefasPorProcesso(prev => { const n = { ...prev }; delete n[processo.id]; return n; });
     } catch (error) {
       alert(error.response?.data?.message || 'Erro ao aprovar assinatura.');
     } finally {
@@ -149,7 +262,6 @@ export function Gestor() {
       </header>
 
       <main className="gestor-main">
-        {/* CARD DO GESTOR */}
         <div className="gestor-card gestor-principal">
           <div className="gestor-foto">
             <img src={fotoGestor} alt={user?.name} />
@@ -160,10 +272,8 @@ export function Gestor() {
           <p className="descricao">Responsável pela coordenação da equipe.</p>
         </div>
 
-        {/* ALERTAS DE 30 DIAS */}
         {!loadingEquipe && <GestorAlertas equipe={equipe} />}
 
-        {/* ASSINATURAS PENDENTES */}
         {!loadingPendencias && pendencias.length > 0 && (
           <div style={{ width: '100%' }}>
             <h3 style={{ color: 'var(--cor-texto)', marginBottom: 20, textAlign: 'center' }}>
@@ -183,6 +293,18 @@ export function Gestor() {
                   <span className="treinamento" style={{ fontStyle: 'italic' }}>
                     Assinatura: "{processo.employeeSignature || '—'}"
                   </span>
+                  <button
+                    onClick={() => handleVerChecklist(processo)}
+                    disabled={loadingChecklist[processo.id]}
+                    style={{
+                      marginTop: 10, width: '100%', padding: '10px', borderRadius: 8,
+                      border: '1px solid var(--cor-principal)', background: 'transparent',
+                      color: 'var(--cor-principal)', fontWeight: 600, cursor: 'pointer',
+                      fontSize: '0.9rem', transition: '0.2s ease'
+                    }}
+                  >
+                    {loadingChecklist[processo.id] ? 'Carregando...' : '📄 Ver Checklist do Colaborador'}
+                  </button>
                   <input
                     type="text"
                     placeholder="Sua assinatura para aprovar"
@@ -211,7 +333,6 @@ export function Gestor() {
           </div>
         )}
 
-        {/* EQUIPE */}
         {loadingEquipe ? (
           <p style={{ opacity: 0.6 }}>Carregando equipe...</p>
         ) : equipe.length === 0 ? (

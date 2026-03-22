@@ -47,6 +47,7 @@ export async function signatureRoutes(app: FastifyInstance) {
               status: { type: 'string' },
               employeeSignature: { type: 'string' },
               completedAt: { type: 'string' },
+               employeeId: { type: 'string' },
               employee: {
                 type: 'object',
                 properties: {

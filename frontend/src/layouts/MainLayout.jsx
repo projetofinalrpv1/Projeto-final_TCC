@@ -27,7 +27,7 @@ export default function MainLayout() {
       name: "Gestor",
       icon: <FaUsers />,
       route: "/app/gestor",
-      roles: ["GESTOR", "ADMIN"]
+      roles: ["GESTOR"]
     },
     {
       name: "Usuários",

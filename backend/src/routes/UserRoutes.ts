@@ -7,7 +7,8 @@ import {
   getTeam,
   replaceUser,
   deactivateUser,
-  patchUser
+  patchUser,
+  getAdminDashboard
 } from '../controllers/UserController';
 import { verifyRole } from '../hooks/checkPermissions';
 
@@ -28,6 +29,7 @@ export async function userRoutes(app: FastifyInstance) {
         properties: {
           name: { type: 'string' },
           email: { type: 'string', format: 'email' },
+          phone: { type: 'string', nullable: true }, // ← adicionado
           password: { type: 'string', minLength: 6 },
           role: { type: 'string', enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] },
           workAreaId: { type: 'string', format: 'uuid' },
@@ -41,6 +43,7 @@ export async function userRoutes(app: FastifyInstance) {
             id: { type: 'string' },
             name: { type: 'string' },
             email: { type: 'string' },
+            phone: { type: 'string', nullable: true }, // ← adicionado
             role: { type: 'string' },
             managerId: { type: 'string', nullable: true }
           }
@@ -67,6 +70,7 @@ export async function userRoutes(app: FastifyInstance) {
               id: { type: 'string' },
               name: { type: 'string' },
               email: { type: 'string' },
+              phone: { type: 'string', nullable: true }, // ← adicionado
               role: { type: 'string' },
               isActive: { type: 'boolean' },
               workArea: {
@@ -100,6 +104,7 @@ export async function userRoutes(app: FastifyInstance) {
             properties: {
               id: { type: 'string' },
               name: { type: 'string' },
+              phone: { type: 'string', nullable: true }, // ← adicionado
               workArea: {
                 type: 'object',
                 properties: { name: { type: 'string' } }
@@ -111,15 +116,46 @@ export async function userRoutes(app: FastifyInstance) {
     }
   }, listManagers);
 
-  // GET /api/users/team — equipe do gestor logado
+  // GET /api/users/team
   app.get('/users/team', {
     onRequest: [
+      app.authenticate,
+      (request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])
+    ],
+    schema: {
+      tags: ['Users'],
+      summary: 'List team members of the logged manager',
+      security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              email: { type: 'string' },
+              role: { type: 'string' },
+              workArea: { type: 'string' },
+              progresso: { type: 'number' },
+              totalTasks: { type: 'number' },
+              completedTasks: { type: 'number' },
+            }
+          }
+        }
+      }
+    }
+  }, getTeam);
+
+  // Adicione no UserRoutes.ts — ANTES das rotas com :id para evitar conflito
+app.get('/users/admin-dashboard', {
+  onRequest: [
     app.authenticate,
-    (request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])
+    (request, reply) => verifyRole(request, reply, ['ADMIN'])
   ],
   schema: {
     tags: ['Users'],
-    summary: 'List team members of the logged manager',
+    summary: 'Dashboard consolidado para o administrador',
     security: [{ bearerAuth: [] }],
     response: {
       200: {
@@ -127,21 +163,23 @@ export async function userRoutes(app: FastifyInstance) {
         items: {
           type: 'object',
           properties: {
-            id: { type: 'string' },
-            name: { type: 'string' },
-            email: { type: 'string' },
-            role: { type: 'string' },
+            gestor: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' }
+              }
+            },
             workArea: { type: 'string' },
-            progresso: { type: 'number' },
-            totalTasks: { type: 'number' },
-            completedTasks: { type: 'number' },
-            createdAt: { type: 'string' },
+            workAreaId: { type: 'string' },
+            totalColaboradores: { type: 'number' },
+            progressoMedio: { type: 'number' },
           }
         }
       }
     }
   }
-}, getTeam);
+}, getAdminDashboard);
 
   // PUT /api/users/:id
   app.put('/users/:id', {
@@ -162,6 +200,7 @@ export async function userRoutes(app: FastifyInstance) {
         properties: {
           name: { type: 'string' },
           email: { type: 'string', format: 'email' },
+          phone: { type: 'string', nullable: true }, // ← adicionado
           password: { type: 'string', minLength: 6 },
           role: { type: 'string', enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] },
           workAreaId: { type: 'string', format: 'uuid' }
@@ -189,6 +228,7 @@ export async function userRoutes(app: FastifyInstance) {
         properties: {
           name: { type: 'string' },
           email: { type: 'string', format: 'email' },
+          phone: { type: 'string', nullable: true }, // ← adicionado
           password: { type: 'string', minLength: 6 },
           role: { type: 'string', enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] },
           workAreaId: { type: 'string', format: 'uuid' },

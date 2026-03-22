@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { createTask, listTasks, listMyTasks, listTasksFromArea,
-        listTemplates, updateTaskStatus, deleteTask } from '../controllers/TaskController';
+        listTemplates, listUserTasks, updateTaskStatus, deleteTask } from '../controllers/TaskController';
 import { verifyRole } from '../hooks/checkPermissions';
 
 export async function taskRoutes(app: FastifyInstance) {
@@ -59,6 +59,36 @@ app.get('/tasks/templates', {
     summary: 'List only template tasks for management'
   }
 }, listTemplates)
+
+app.get('/tasks/user/:userId', {
+  onRequest: [
+    app.authenticate,
+    (request, reply) => verifyRole(request, reply, ['ADMIN', 'GESTOR'])
+  ],
+  schema: {
+    tags: ['Tasks'],
+    summary: 'List tasks of a specific user',
+    params: {
+      type: 'object',
+      properties: { userId: { type: 'string' } }
+    },
+    response: {
+      200: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            status: { type: 'string' },
+            priority: { type: 'string' },
+          }
+        }
+      }
+    }
+  }
+}, listUserTasks);
   // 4. Update Status (Available for all authenticated users)
   app.patch('/tasks/:id/status', {
     schema: {

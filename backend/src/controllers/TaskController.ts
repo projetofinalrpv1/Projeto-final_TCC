@@ -48,6 +48,12 @@ export const listTasksFromArea = async (request: FastifyRequest, reply: FastifyR
   return reply.send(tasks);
 };
 
+export const listUserTasks = async (request: FastifyRequest, reply: FastifyReply) => {
+  const { userId } = request.params as { userId: string };
+  const tasks = await taskService.executeListByUser(userId, request.user);
+  return reply.send(tasks);
+};
+
 export const listTemplates = async (request: FastifyRequest, reply: FastifyReply) => {
   const templates = await taskService.executeListTemplates(request.user.workAreaId);
   return reply.send(templates);

@@ -35,7 +35,7 @@ export function AppRoutes() {
               <Route path="material/:id" element={<MaterialDetalhes />} />
 
               {/* Apenas GESTOR e ADMIN */}
-              <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'GESTOR']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['GESTOR']} />}>
                 <Route path="gestor" element={<Gestor />} />
               </Route>
 
