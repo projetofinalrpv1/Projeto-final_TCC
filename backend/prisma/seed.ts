@@ -91,7 +91,7 @@ async function main() {
   ]
 
   for (const m of materiaisIniciais) {
-    // Usamos findFirst para checar se já existe, evitando o erro do upsert
+  
     const existe = await prisma.material.findFirst({
       where: { title: m.title, workAreaId: m.workAreaId }
     })
@@ -124,8 +124,7 @@ async function main() {
   ];
 
   for (const t of tarefasTemplate) {
-    // Aqui, se você não tiver @@unique([title, workAreaId]) no schema de Task, 
-    // use a mesma lógica do findFirst acima para evitar erros:
+
     const existeTask = await prisma.task.findFirst({
       where: { title: t.title, workAreaId: t.workAreaId, isTemplate: true }
     })

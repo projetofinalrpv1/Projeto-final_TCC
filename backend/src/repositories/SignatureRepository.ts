@@ -19,7 +19,7 @@ export class SignatureRepository {
     });
   }
   
-  // E já pode adicionar aquele método de listagem do gestor aqui:
+
   async listPendingByManager(managerId: string) {
     return await prisma.signatureProcess.findMany({
       where: {

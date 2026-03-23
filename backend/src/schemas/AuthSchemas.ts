@@ -9,8 +9,6 @@ export const loginSchema = z.object({
 export type AuthDTO = z.infer<typeof loginSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 
-// Schema de resposta do /auth/me
-// Reutiliza os dados que já vêm do banco via UserService.executeGetDetails()
 export const meResponseSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),

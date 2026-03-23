@@ -15,12 +15,12 @@ export class AuthService {
     return user;
   }
 
-  // Retorna os dados do usuário autenticado a partir do id extraído do token (sub)
+ 
   async getMe(userId: string) {
     const user = await userRepository.findById(userId);
     if (!user) throw new AppError("Usuário não encontrado.", 404);
 
-    // Reutiliza o mesmo sanitize pattern do UserService — sem expor a senha
+
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }

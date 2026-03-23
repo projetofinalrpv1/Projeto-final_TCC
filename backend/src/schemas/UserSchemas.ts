@@ -9,15 +9,16 @@ export const createUserSchema = z.object({
   role: z.enum(['COLABORADOR', 'GESTOR', 'ADMIN']),
   workAreaId: z.string().uuid(),
   managerId: z.string().uuid().optional().nullable(),
+  dataInicio: z.string().optional().nullable(), 
 });
 
-// A MÁGICA: Gera o tipo (interface) automaticamente
+
 export type CreateUserDTO = z.infer<typeof createUserSchema>;
 
-// Schema de Patch (Partial)
+
 export const patchUserSchema = createUserSchema.partial().extend({
   password: z.string().min(6).optional().nullable(),
-  // Adicione isso aqui para o Zod aceitar o campo:
+
   isActive: z.boolean().optional(),
 });
 

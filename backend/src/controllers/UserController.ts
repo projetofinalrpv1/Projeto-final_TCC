@@ -2,12 +2,12 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { UserService } from '../services/UserService';
 import { createUserSchema, patchUserSchema, putUserSchema } from '../schemas/UserSchemas';
 
-// Instanciamos o service uma vez para usar em todos os métodos
+
 const userService = new UserService();
 
 export const createUser = async (request: FastifyRequest, reply: FastifyReply) => {
   const data = createUserSchema.parse(request.body);
-  // Passamos o request.user para o Service validar se o solicitante é ADMIN
+
   const user = await userService.executeCreate(data, request.user); 
   return reply.status(201).send(user);
 };
@@ -30,7 +30,7 @@ export const replaceUser = async (request: FastifyRequest, reply: FastifyReply) 
   const { id } = request.params as { id: string };
   const data = putUserSchema.parse(request.body);
   
-  // Adicione a validação de permissão aqui também, conforme necessário
+ 
   const user = await userService.executeReplace(id, data, request.user);
   return reply.status(200).send(user);
 };
@@ -50,10 +50,17 @@ export const listManagers = async (request: FastifyRequest, reply: FastifyReply)
 
 export const getTeam = async (request: FastifyRequest, reply: FastifyReply) => {
   const { sub } = request.user as { sub: string };
-  const team = await userService.executeGetTeam(sub);
-  return reply.status(200).send(team);
-
   
+  const user = await userService.executeGetDetails(sub);
+  
+  if (!user.workArea?.id) {
+    return reply.status(400).send({ 
+      error: "Usuário não tem área de trabalho associada" 
+    });
+  }
+  
+  const team = await userService.executeGetTeam(sub, user.workArea.id);
+  return reply.status(200).send(team);
 };
 
 // Adicione no UserController.ts

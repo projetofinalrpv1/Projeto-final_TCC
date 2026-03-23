@@ -37,7 +37,7 @@ export async function authRoutes(app: FastifyInstance) {
     },
   }, login);
 
-  // Adicione essa rota no seu AuthRoutes.ts existente
+ 
 
 // POST /auth/reset-password — rota pública
 app.post('/reset-password', {

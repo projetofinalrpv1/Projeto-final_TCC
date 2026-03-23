@@ -5,7 +5,7 @@ async findAll() {
   return await prisma.workArea.findMany({
     select: {
       id: true,
-      name: true, // <--- O erro estava aqui, faltou incluir o nome
+      name: true,
      
     },
     orderBy: {

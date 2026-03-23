@@ -79,7 +79,6 @@ app.get('/healthcheck', async () => {
 });
 
 // ── 6. WhatsApp + Worker ──
-// Inicia após o servidor estar pronto para não bloquear o startup
 app.addHook('onReady', async () => {
   try {
     // Conecta ao WhatsApp — QR Code aparece no terminal
@@ -93,7 +92,7 @@ app.addHook('onReady', async () => {
 
     console.log('🤖 Worker de mensagens WhatsApp iniciado (intervalo: 1 minuto)');
   } catch (error) {
-    // Não derruba o servidor se o WhatsApp falhar
+   
     console.error('⚠️  Erro ao iniciar WhatsApp Service:', error);
     console.warn('⚠️  O servidor continuará funcionando sem WhatsApp.');
   }

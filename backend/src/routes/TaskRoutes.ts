@@ -4,7 +4,7 @@ import { createTask, listTasks, listMyTasks, listTasksFromArea,
 import { verifyRole } from '../hooks/checkPermissions';
 
 export async function taskRoutes(app: FastifyInstance) {
-  // 1. Global Protection: All routes below require authentication
+  // Hook global para autenticação (pode ser sobrescrito por rotas específicas se necessário)
   app.addHook('onRequest', app.authenticate);
 
   // 2. Create Task (Restricted: GESTOR or ADMIN)

@@ -14,7 +14,7 @@ class WhatsAppService {
   private isConnected = false;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  private waitingForQR = false; // flag para pausar reconexão enquanto QR está visível
+  private waitingForQR = false; 
 
   async connect() {
     try {

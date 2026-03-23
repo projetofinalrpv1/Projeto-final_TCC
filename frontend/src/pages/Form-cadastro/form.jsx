@@ -5,7 +5,8 @@ import "./Form.css";
 
 export default function Form({ fechar, usuarioEditando }) {
   const isEdicao = !!usuarioEditando;
-
+  const getHoje = () => new Date().toISOString().split('T')[0];
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,7 +15,7 @@ export default function Form({ fechar, usuarioEditando }) {
     role: "COLABORADOR",
     workAreaId: "",
     managerId: "",
-    dataInicio: "",
+    dataInicio: isEdicao ? "" : getHoje(), 
   });
 
   const [workareas, setWorkareas] = useState([]);
@@ -120,22 +121,20 @@ export default function Form({ fechar, usuarioEditando }) {
             required
           />
 
-          {/* Telefone — obrigatório para GESTOR (receberá o lembrete),
-              opcional para COLABORADOR */}
-          <label>
-            Telefone (WhatsApp)
-            {formData.role === 'GESTOR' && (
-              <span style={{ color: '#e74c3c', marginLeft: 4 }}>*</span>
-            )}
-          </label>
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Ex: 5511999999999 (com DDI e DDD)"
-            required={formData.role === 'GESTOR'}
-          />
+         <label>
+    Telefone (WhatsApp)
+    {formData.role === 'GESTOR' && (
+      <span style={{ color: '#e74c3c', marginLeft: 4 }}>*</span>
+    )}
+  </label>
+  <input
+    type="text" // Alterado para text para maior customização
+    name="phone"
+    value={formData.phone}
+    onChange={handleChange}
+    placeholder="Ex: 5511999999999"
+    required={formData.role === 'GESTOR'}
+  />
           <small style={{ opacity: 0.6, fontSize: '0.78rem', marginTop: -6 }}>
             Formato: DDI + DDD + número (ex: 5511999999999)
           </small>
@@ -166,13 +165,12 @@ export default function Form({ fechar, usuarioEditando }) {
           </select>
 
           <label>Data de Início do Treinamento</label>
-          <input
-            type="date"
-            name="dataInicio"
-            value={formData.dataInicio}
-            onChange={handleChange}
-          />
-
+  <input
+    type="date"
+    name="dataInicio"
+    value={formData.dataInicio}
+    onChange={handleChange}
+  />
           <label>É Gestor?</label>
           <div className="radio-group">
             <label>

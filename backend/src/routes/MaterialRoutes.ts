@@ -64,9 +64,9 @@ export async function materialRoutes(app: FastifyInstance) {
             properties: {
               id: { type: 'string' },
               titulo: { type: 'string' },
-              gestor: { type: 'string' },      // ← corrigido de 'professor' para 'gestor'
-              descricao: { type: 'string' },   // ← adicionado
-              arquivoUrl: { type: 'string' },  // ← adicionado
+              gestor: { type: 'string' },      
+              descricao: { type: 'string' },  
+              arquivoUrl: { type: 'string' },  
               rota: { type: 'string' },
               workAreaId: { type: 'string' }
             }

@@ -1,7 +1,7 @@
 import { prisma } from '../lib/prisma';
 
 export class MaterialRepository {
-  // Agora os parâmetros seguem o padrão inglês
+
   async create(data: {
     title: string;
     manager: string;
@@ -37,13 +37,13 @@ export class MaterialRepository {
     return await prisma.material.findMany({
       where: {
         workArea: {
-          name: "Geral" // O nome aqui se refere ao property 'name' da WorkArea
+          name: "Geral" 
         }
       },
       include: {
         workArea: {
           select: {
-            name: true, // Aqui também mudamos para inglês
+            name: true,
           },
         },
       },

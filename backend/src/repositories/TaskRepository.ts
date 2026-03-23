@@ -133,7 +133,7 @@ async findByArea(workAreaId: string) {
     where: {
       isTemplate: false,
       user: {
-        workAreaId: workAreaId, // ← filtra pelo workAreaId do USUÁRIO, não da tarefa
+        workAreaId: workAreaId, 
         isActive: true
       }
     },

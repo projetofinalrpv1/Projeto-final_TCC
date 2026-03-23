@@ -16,6 +16,7 @@ model User {
   role       String  
   workAreaId String
   workArea   WorkArea @relation(fields: [workAreaId], references: [id])
+  startDate    DateTime?
   isActive   Boolean  @default(true)
   
   managerId  String?

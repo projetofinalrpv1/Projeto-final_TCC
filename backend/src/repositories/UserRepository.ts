@@ -1,8 +1,8 @@
 import { prisma } from '../lib/prisma';
-import { Prisma } from '@prisma/client'; // Importante: Importar os tipos gerados
+import { Prisma } from '@prisma/client'; 
 
 export class UserRepository {
-  // Agora o TypeScript sabe exatamente quais campos são obrigatórios
+
   async create(data: Prisma.UserCreateInput) {
     return await prisma.user.create({ data });
   }
@@ -29,7 +29,6 @@ export class UserRepository {
     });
   }
 
-  // Usamos UserUpdateInput para que o TS valide apenas campos editáveis
   async update(id: string, data: Prisma.UserUpdateInput) {
     return await prisma.user.update({
       where: { id },
@@ -66,7 +65,7 @@ export class UserRepository {
     });
   }
 
-// Adicione este método no UserRepository.ts
+
 async getAdminDashboard() {
   return await prisma.user.findMany({
     where: { role: 'GESTOR', isActive: true },

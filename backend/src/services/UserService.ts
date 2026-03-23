@@ -31,6 +31,7 @@ export class UserService {
       phone: data.phone || null,
       password: hashedPassword,
       role: data.role,
+      startDate: data.dataInicio ? new Date(data.dataInicio) : null,
       workArea: { connect: { id: data.workAreaId } },
       ...(data.managerId && { manager: { connect: { id: data.managerId } } })
     };
@@ -81,10 +82,15 @@ export class UserService {
   }
 
   async executeGetDetails(id: string) {
-    const user = await this.userRepository.findById(id);
-    if (!user) throw new AppError("Usuário não encontrado.", 404);
-    return this.sanitizeUser(user);
-  }
+  const user = await this.userRepository.findById(id);
+  if (!user) throw new AppError("Usuário não encontrado.", 404);
+  
+ 
+  return {
+    ...this.sanitizeUser(user),
+    workArea: user.workArea
+  };
+}
 
   async executeListManagers() {
     const managers = await this.userRepository.findManyByRole('GESTOR');

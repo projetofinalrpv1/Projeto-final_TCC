@@ -29,7 +29,7 @@ export async function userRoutes(app: FastifyInstance) {
         properties: {
           name: { type: 'string' },
           email: { type: 'string', format: 'email' },
-          phone: { type: 'string', nullable: true }, // ← adicionado
+          phone: { type: 'string', nullable: true }, 
           password: { type: 'string', minLength: 6 },
           role: { type: 'string', enum: ['COLABORADOR', 'GESTOR', 'ADMIN'] },
           workAreaId: { type: 'string', format: 'uuid' },
@@ -43,7 +43,7 @@ export async function userRoutes(app: FastifyInstance) {
             id: { type: 'string' },
             name: { type: 'string' },
             email: { type: 'string' },
-            phone: { type: 'string', nullable: true }, // ← adicionado
+            phone: { type: 'string', nullable: true },
             role: { type: 'string' },
             managerId: { type: 'string', nullable: true }
           }
@@ -70,7 +70,7 @@ export async function userRoutes(app: FastifyInstance) {
               id: { type: 'string' },
               name: { type: 'string' },
               email: { type: 'string' },
-              phone: { type: 'string', nullable: true }, // ← adicionado
+              phone: { type: 'string', nullable: true }, 
               role: { type: 'string' },
               isActive: { type: 'boolean' },
               workArea: {
@@ -104,7 +104,7 @@ export async function userRoutes(app: FastifyInstance) {
             properties: {
               id: { type: 'string' },
               name: { type: 'string' },
-              phone: { type: 'string', nullable: true }, // ← adicionado
+              phone: { type: 'string', nullable: true }, 
               workArea: {
                 type: 'object',
                 properties: { name: { type: 'string' } }
@@ -147,7 +147,6 @@ export async function userRoutes(app: FastifyInstance) {
     }
   }, getTeam);
 
-  // Adicione no UserRoutes.ts — ANTES das rotas com :id para evitar conflito
 app.get('/users/admin-dashboard', {
   onRequest: [
     app.authenticate,
