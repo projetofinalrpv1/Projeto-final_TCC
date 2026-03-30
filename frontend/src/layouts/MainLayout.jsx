@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Header } from "../components/Header/Header";
-import { Sidebar } from "../components/Sidebar/Sidebar";
+import { Sidebar } from "../components/SideBar/SideBar";
 import { FaHome, FaUsers, FaTasks, FaUserShield } from "react-icons/fa";
 import { useAuth } from "../contexts/useAuth";
 
