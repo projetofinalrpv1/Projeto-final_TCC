@@ -40,7 +40,7 @@ if (!jwtSecret) {
 }
 
 // ── 3. Plugins de Infraestrutura ──
-app.register(cors, { origin: 'projeto-finaltcc-production.up.railway.app' });
+app.register(cors, { origin: 'https://onboardingextensaoonthejob.vercel.app' });
 app.register(fastifyJwt, { secret: jwtSecret });
 app.register(auth);
 
