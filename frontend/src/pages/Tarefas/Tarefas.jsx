@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { useAuth } from "../../contexts/useAuth";
 import api from "../../service/api";
 import { jsPDF } from "jspdf";
-import "./tarefas.css";
+import "./Tarefas.css";
 import { LOGO_BASE64 } from "../../assets/logo";
 const prioridadeLabel = { LOW: 'Baixa', MEDIUM: 'Média', HIGH: 'Alta' };
 const prioridadeCor = { LOW: '#4caf50', MEDIUM: '#ffb300', HIGH: '#e74c3c' };

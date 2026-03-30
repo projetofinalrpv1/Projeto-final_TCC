@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { FaUserPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import api from '../../service/api';
-import Form from '../Form-cadastro/form';
+import Form from '../Form-cadastro/Form';
 import "./Usuarios.css";
 
 export function Usuarios() {
