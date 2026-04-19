@@ -9,8 +9,8 @@ import { z } from 'zod';
 import { AppError } from './errors/AppError';
 import auth from './plugins/auth';
 
-import { whatsappService } from './services/WhatsAppService';
-import { checkAndSendMessages } from './services/QueueService';
+//import { whatsappService } from './services/WhatsAppService';
+//import { checkAndSendMessages } from './services/QueueService';
 
 import { authRoutes } from './routes/AuthRoutes';
 import { userRoutes } from './routes/UserRoutes';
@@ -79,36 +79,36 @@ app.get('/healthcheck', async () => {
 });
 
 // ── 6. WhatsApp + Worker ──
-app.addHook('onReady', async () => {
-  try {
-    // Conecta ao WhatsApp — QR Code aparece no terminal
-    await whatsappService.connect();
-    console.log('📱 WhatsApp Service iniciado — aguardando conexão...');
+// app.addHook('onReady', async () => {
+//   try {
+//     // Conecta ao WhatsApp — QR Code aparece no terminal
+//     await whatsappService.connect();
+//     console.log('📱 WhatsApp Service iniciado — aguardando conexão...');
 
-    // Inicia o worker que verifica mensagens pendentes a cada 1 minuto
-    setInterval(() => {
-      checkAndSendMessages();
-    }, 60 * 1000);
+//     // Inicia o worker que verifica mensagens pendentes a cada 1 minuto
+//     setInterval(() => {
+//       checkAndSendMessages();
+//     }, 60 * 1000);
 
-    console.log('🤖 Worker de mensagens WhatsApp iniciado (intervalo: 1 minuto)');
-  } catch (error) {
+//     console.log('🤖 Worker de mensagens WhatsApp iniciado (intervalo: 1 minuto)');
+//   } catch (error) {
    
-    console.error('⚠️  Erro ao iniciar WhatsApp Service:', error);
-    console.warn('⚠️  O servidor continuará funcionando sem WhatsApp.');
-  }
-});
+//     console.error('⚠️  Erro ao iniciar WhatsApp Service:', error);
+//     console.warn('⚠️  O servidor continuará funcionando sem WhatsApp.');
+//   }
+// });
 
-app.get('/test-whatsapp', async (request, reply) => {
-  try {
-    const me = whatsappService.socket?.user;
-    console.log('USER ID:', JSON.stringify(me)); // ← adiciona isso
+// app.get('/test-whatsapp', async (request, reply) => {
+//   try {
+//     const me = whatsappService.socket?.user;
+//     console.log('USER ID:', JSON.stringify(me)); // ← adiciona isso
     
-    await whatsappService.sendToSelf(
-      '🔔 *ON THE JOB* - Teste de integração WhatsApp funcionando!'
-    );
-    return reply.send({ message: 'Mensagem enviada!' });
-  } catch (error: any) {
-    return reply.status(500).send({ message: error.message });
-  }
-});
+//     await whatsappService.sendToSelf(
+//       '🔔 *ON THE JOB* - Teste de integração WhatsApp funcionando!'
+//     );
+//     return reply.send({ message: 'Mensagem enviada!' });
+//   } catch (error: any) {
+//     return reply.status(500).send({ message: error.message });
+//   }
+// });
 export { app };
