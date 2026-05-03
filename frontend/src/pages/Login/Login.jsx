@@ -1,8 +1,10 @@
 // src/pages/Login/Login.jsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/useAuth";
 import api from "../../service/api";
+import logo from '../../assets/Logo-on-the-job1.PNG';
 import "./Login.css";
 
 export function Login() {
@@ -22,6 +24,8 @@ export function Login() {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [resetMsg, setResetMsg] = useState({ texto: "", tipo: "" });
   const [loadingReset, setLoadingReset] = useState(false);
+
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -82,7 +86,7 @@ export function Login() {
 
   return (
     <div className="aba-principal">
-      <img src="./src/assets/Logo-on-the-job1.PNG" alt="Logo On The Job" />
+       <img src={logo} alt="Logo On The Job" />
       <h1>ON THE JOB</h1>
 
       <div className="login-container">
