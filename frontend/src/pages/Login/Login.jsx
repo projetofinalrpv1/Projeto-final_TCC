@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/useAuth";
 import api from "../../service/api";
-import logo from '../../assets/Logo-on-the-job1.PNG';
+import logo from '../../assets/Logo-on-the-job1.png';
 import "./Login.css";
 
 export function Login() {
